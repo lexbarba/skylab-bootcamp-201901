@@ -1,0 +1,1 @@
+module.exports = file => file.match(/\n/g) === null ? 0 : file.match(/\n/g).length

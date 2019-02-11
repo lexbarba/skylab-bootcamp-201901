@@ -1,0 +1,1 @@
+module.exports = (...nums) => nums.reduce((accum, currentValue) => Number(accum) + Number(currentValue))
