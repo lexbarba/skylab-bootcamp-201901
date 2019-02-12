@@ -1,5 +1,8 @@
-var net = require('net')  
-var server = net.createServer(function (socket) {  
+var net = require('net') 
+
+const {argv: [,, port] } = process
+
+var server = net.createServer(socket => {  
     var date = new Date()
     var year = date.getFullYear()  
     var month = date.getMonth().toString().length === 1 ? `0${date.getMonth()+1}` : date.getMonth()+1   
@@ -9,4 +12,4 @@ var server = net.createServer(function (socket) {
     data = `${year}-${month}-${day} ${hour}:${min}`
     socket.end(`${data}\n`)
 })  
-server.listen(process.argv[2]) 
+server.listen(port) 

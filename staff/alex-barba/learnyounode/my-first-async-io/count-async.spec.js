@@ -1,6 +1,6 @@
 const { expect } = require('chai')
 
-const countAsync = require('./countAsync')
+const countAsync = require('./count-async')
 
 describe('my first async io', ()=> {
     it('should succed on right data', () => {
