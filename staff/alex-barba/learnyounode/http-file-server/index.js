@@ -1,12 +1,15 @@
 var http = require('http') 
 var fs = require('fs')
 
-var server = http.createServer((request, response) => {
-    var src = fs.createReadStream(process.argv[3])
-    src.pipe(dst)
+const { argv: [, , port, file] } = process
 
-}) 
-server.listen(process.argv[2]) 
+http.createServer((req, resp) => {
+
+    resp.writeHead(200, {'content-type' : 'text/html'})
+    const rs = fs.createReadStream(file)
+    rs.pipe(resp)
+
+}).listen(port) 
 
 
 
