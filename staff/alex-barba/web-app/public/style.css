@@ -1,8 +1,51 @@
-.register {
+.feedback, .home, .login, .register {
   border: 1px solid black;
   border-radius: 1em;
   padding: 1em;
   margin: 1em;
+}
+
+.register {
+  background-color: #FA7E1F;
+}
+
+.feedback, .home, .login, .register {
+  border: 1px solid black;
+  border-radius: 1em;
+  padding: 1em;
+  margin: 1em;
+}
+
+.login {
+  background-color: #AC73D4;
+}
+
+.feedback, .home, .register, .login {
+  border: 1px solid black;
+  border-radius: 1em;
+  padding: 1em;
+  margin: 1em;
+}
+
+.home {
+  background-color: #06FF7D;
+}
+
+.feedback, .register, .login, .home {
+  border: 1px solid black;
+  border-radius: 1em;
+  padding: 1em;
+  margin: 1em;
+}
+
+.feedback {
+  background-color: limegreen;
+}
+.feedback--warn {
+  background-color: gold;
+}
+.feedback--error {
+  background-color: tomato;
 }
 
 /*# sourceMappingURL=style.css.map */

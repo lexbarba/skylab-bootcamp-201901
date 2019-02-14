@@ -9,40 +9,13 @@
 
 const userApi = require('../user-api')
 
-const logic = {
+class Logic {
 
-    setUserId(id) {
-        this.___userId___ = id
-    },
+    constructor(storage = {}) {
+        if (typeof storage !== 'object') throw TypeError(`${storage} is not an object`)
 
-    getUserId() {
-        return this.___userId___
-    },
-
-    setUserApiToken(token) {
-        this.___userApiToken___ = token
-    },
-
-    getUserApiToken() {
-        return this.___userApiToken___
-    },
-
-    set __userId__(id) {
-        this.setUserId(id)
-    },
-
-    get __userId__() {
-        return this.getUserId()
-    },
-
-    set __userApiToken__(token) {
-        this.setUserApiToken(token)
-    },
-
-    get __userApiToken__() {
-        return this.getUserApiToken()
-    },
-
+        this.__storage__ = storage
+    }
 
     /**
    * Registers a user.
@@ -88,7 +61,7 @@ const logic = {
         if (password !== passwordConfirm) throw Error("passwords do not match");
 
         return userApi.register(name, surname, email, password).then(() => { });
-    },
+    }
 
     /**
      * Login by credentials.
@@ -111,26 +84,20 @@ const logic = {
 
         if (!password.trim().length) throw Error("password is empty");
 
-        return userApi.authenticate(email, password).then(response => {
-            const { data: { id, token }, status} = response
+        return userApi.authenticate(email, password).then(({ data: { id, token } }) => {
+            this.__storage__.userId = id
+            this.__storage__.userApiToken = token
+        })
+    }
 
-            if (status === "OK") {
-                this.__userId__ = id
-                this.__userApiToken__ = token
-                return response.data
-            }
-            throw Error(response.error)
-        });
-    },
+    get isUserLoggedIn() {
+        return !!this.__storage__.userId
+    }
 
-    get userLoggedIn() {
-        return !!this.__userId__
-    },
-
-    logout() {
-        this.__userId__ = null
-        this.__userApiToken__ = null
-    },
+    logOut() {
+        this.__storage__.userId = null
+        this.__storage__.userApiToken = null
+    }
 
     /**
      * Retrieve user data.
@@ -146,13 +113,36 @@ const logic = {
 
     retrieveUser() {
 
-        return userApi.retrieve(this.__userId__, this.__userApiToken__).then(response => {
+        return userApi.retrieve(this.__storage__.userId, this.__storage__.userApiToken).then(response => {
             const { name } = response
 
             if (name) return response
             throw Error(response.error);
         });
     }
+
+    /**
+     * 
+     * Updates user data.
+     *
+     * @param {Object} - New data to be added
+     *
+     * @throws {TypeError} - If the param is not an Object.
+     *
+     * @returns {Object} - If the update was successfull or not.
+     */
+
+    updateUser(data) {
+        if (data.constructor !== Object) throw TypeError(`${data} is not an object`)
+
+        return userApi.update(this.__storage__.userId, this.__storage__.userApiToken, data)
+            .then(response => {
+                const { status } = response
+
+                if (status === "OK") return response
+                throw Error(response.error)
+            });
+    }
 };
 
-module.exports = logic
+module.exports = Logic

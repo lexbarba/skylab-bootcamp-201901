@@ -81,9 +81,6 @@ describe("logic testing", () => {
         it("should fail on wrong email", () =>
             logic
             .login(emailTest, password)
-            .then(() => {
-                throw Error("should not have passed by here");
-            })
             .catch(error => {
                 expect(error).to.exist;
                 expect(error.message).to.equal(
@@ -94,9 +91,6 @@ describe("logic testing", () => {
         it("should fail on wrong password", () =>
             logic
             .login(email, passwordTest)
-            .then(() => {
-                throw Error("should not have passed by here");
-            })
             .catch(error => {
                 expect(error).to.exist;
                 expect(error.message).to.equal(`username and/or password wrong`);
@@ -131,8 +125,7 @@ describe("logic testing", () => {
         beforeEach(() => {
             email = `manuelbarzi@mail.com-${Math.random()}`;
     
-            return logic
-            .register(name, surname, email, password, passwordConfirm)
+            return logic.register(name, surname, email, password, passwordConfirm)
                 .then(() => logic.login(email, password));
         });
     
@@ -141,4 +134,32 @@ describe("logic testing", () => {
                 .then((data) => expect(data).to.exist)
         )
         });
+
+        describe("updateUser", () => {
+            const name = "Manuel";
+            const surname = "Barzi";
+            let email;
+            const password = "123";
+            const passwordConfirm = password;
+            const data = { favourites: [{ id: "1011334", name: "3-D Man" }] };
+        
+            beforeEach(() => {
+              email = `manuelbarzi@mail.com-${Math.random()}`;
+        
+              return logic.register(name, surname, email, password, passwordConfirm)
+                .then(() => logic.login(email, password))
+            });
+        
+            it("should succed pushing new data", () => {
+              return logic.updateUser(data)
+                .then(data => {
+                  expect(data).to.exist
+                  expect(data.status).to.equal("OK")})
+            });
+        
+            it("should fail when data is not an object", () => {
+                expect(() => logic.updateUser(12)).to.throw(Error, "12 is not an object");
+            });
+        
+          });
 })
