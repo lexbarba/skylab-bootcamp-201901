@@ -2,18 +2,19 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const logicFactory = require('./src/logic-factory')
 const session = require('express-session')
+const FileStore = require('session-file-store')(session)
 
 const { argv: [, , port = 8080] } = process
 
 const app = express()
 
 app.use(session({
-    secret: 'a secret phrase used to encrypt data that flows from server to client and viceversa',
+    secret: 'my secret',
     resave: true,
-    saveUninitialized: true
-    // store: new FileStore({
-    //     path: './.sessions'
-    // })
+    saveUninitialized: true,
+    store: new FileStore({
+        path: './.sessions'
+    })
 }))
 
 const formBodyParser = bodyParser.urlencoded({ extended: false })
@@ -21,8 +22,11 @@ const formBodyParser = bodyParser.urlencoded({ extended: false })
 app.use(express.static('public'))
 
 function pullFeedback(req) {
-    const { session: { feedback } } = req
+     const { session: { feedback } } = req
+    //const feedback = req.session.feedback
+
     req.session.feedback = null
+    
     return feedback
 }
 
@@ -36,13 +40,22 @@ function render(content) {
         <h1>HELLO WORLD</h1>
         ${content}
     </body>
-    </html>`
-
+</html>`
 }
+
+app.get('/', (req, res) => {
+    res.send(render(`<section class="landing">
+        <a href="/login">Login</a> or <a href="/register">Register</a>
+    </section>`))
+})
 
 app.get('/register', (req, res) => {
     const feedback = pullFeedback(req)
+    const logic = logicFactory.create(req)
 
+    if (logic.isUserLoggedIn) {
+        res.redirect('/home')
+    } else {
     res.send(render((`<section class="register">
     <h2>Register</h2>
     <form method="POST" action="/register">
@@ -54,9 +67,9 @@ app.get('/register', (req, res) => {
     <button type="submit">Register</button>
     </form>
     ${feedback ? `<section class="feedback feecdack-warn">${feedback}</section>` : ''}
-</section>`)))
+    Go <a href="/">Home</a> or <a href="/login">Login</a>
+</section>`)))}
 })
-
 
 app.post('/register', formBodyParser, (req, res) => {
     const { body: { name, surname, email, password, passwordConfirm } } = req
@@ -81,7 +94,11 @@ app.post('/register', formBodyParser, (req, res) => {
 
 app.get('/login', (req, res) => {
     const feedback = pullFeedback(req)
-    res.send(render(`<section class="login">
+    const logic = logicFactory.create(req)
+
+    if (logic.isUserLoggedIn) {
+        res.redirect('/home')
+    } else {res.send(render(`<section class="login">
     <h2>Log in</h2>
     <form method="POST" action="/login">
     <input name="email" type="email" placeholder="Email" required>
@@ -89,7 +106,8 @@ app.get('/login', (req, res) => {
     <button type="submit">Log in</button>
     </form>
     ${feedback ? `<section class="feedback feecdack-warn">${feedback}</section>` : ''}
-</section>`))
+    Go <a href="/">Home</a> or <a href="/register">Register</a>
+</section>`))}
 })
 
 app.post('/login', formBodyParser, (req, res) => {
@@ -97,15 +115,12 @@ app.post('/login', formBodyParser, (req, res) => {
     const logic = logicFactory.create(req)
 
     try {
-        if (logic.isUserLoggedIn) {
         logic.login(email, password)
             .then(() => res.redirect('/home'))
             .catch(({ message }) => {
                 req.session.feedback = message
                 res.redirect('/login')
-        })} else {
-            res.redirect('/home')
-        }
+        })
     } catch ({ message }) {
         req.session.feedback = message
         res.redirect('/login')
@@ -114,9 +129,9 @@ app.post('/login', formBodyParser, (req, res) => {
 })
 
 app.get('/home', (req, res) => {
-    const logic = logicFactory.create(req)
 
     try {
+        const logic = logicFactory.create(req)
         if (logic.isUserLoggedIn) {
 
             logic.retrieveUser()
@@ -126,6 +141,9 @@ app.get('/home', (req, res) => {
     <h2>Home</h2>
     <p>Welcome ${name.toUpperCase()} to your home!</p>
     ${feedback ? `<section class="feedback feecdack-warn">${feedback}</section>` : ''}
+    <form action="/logout" method="post">
+        <button type="submit">Log Out</button>
+    </form>
 </section>`))
                 })
                 .catch(({ message }) => {
@@ -140,5 +158,18 @@ app.get('/home', (req, res) => {
         res.redirect('/home')
     }
 })
+
+app.post('/logout', (req, res) => {
+    const logic = logicFactory.create(req)
+
+    logic.logOut()
+
+    res.redirect('/')
+})
+
+app.get('*', (req, res) => res.send(404, render(`<section class="not-found">
+        <h2>NOT FOUND</h2>
+        Go <a href="/">Home</a>
+    </section>`)))
 
 app.listen(port, () => console.log(`server running on port ${port}`))
