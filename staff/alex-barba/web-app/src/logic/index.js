@@ -10,7 +10,7 @@
 const userApi = require('../user-api')
 
 class Logic {
-
+    
     constructor(storage = {}) {
         if (typeof storage !== 'object') throw TypeError(`${storage} is not an object`)
 

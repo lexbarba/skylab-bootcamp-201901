@@ -1,20 +1,24 @@
+require('dotenv').config()
+
 const express = require('express')
 const bodyParser = require('body-parser')
 const logicFactory = require('./src/logic-factory')
 const session = require('express-session')
-const FileStore = require('session-file-store')(session)
+// const FileStore = require('session-file-store')(session)
 
-const { argv: [, , port = 8080] } = process
+const { enc:{PORT}, argv: [, , port = PORT || 8080] } = process
 
 const app = express()
+
+app.set('view engine', 'pug')
 
 app.use(session({
     secret: 'my secret',
     resave: true,
     saveUninitialized: true,
-    store: new FileStore({
-        path: './.sessions'
-    })
+    // store: new FileStore({
+    //     path: './.sessions'
+    // })
 }))
 
 const formBodyParser = bodyParser.urlencoded({ extended: false })
@@ -22,8 +26,7 @@ const formBodyParser = bodyParser.urlencoded({ extended: false })
 app.use(express.static('public'))
 
 function pullFeedback(req) {
-     const { session: { feedback } } = req
-    //const feedback = req.session.feedback
+    const { session: { feedback } } = req
 
     req.session.feedback = null
     

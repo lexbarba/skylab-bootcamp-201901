@@ -1,5 +1,5 @@
 
-const logic = require('.')
+const Logic = require('.')
 const {expect} = require('chai')
 
 describe("logic testing", () => {
@@ -8,7 +8,8 @@ describe("logic testing", () => {
         let surname = "Barzi";
         let email = `manuelbarzi@mail.com-${Math.random()}`;
         let password = "123";
-        let passwordConfirm = password;
+        let passwordConfirm = password
+        const logic = new Logic
   
         it("should succed on correct data", () =>
         logic.register(name, surname, email, password, passwordConfirm)
@@ -66,6 +67,7 @@ describe("logic testing", () => {
     
         const emailTest = "dasdasdasd";
         const passwordTest = "111";
+        const logic = new Logic
     
         beforeEach(() => {
             email = `manuelbarzi@mail.com-${Math.random()}`;
@@ -74,8 +76,8 @@ describe("logic testing", () => {
     
         it("should succeed on correct credentials", () =>
             logic.login(email, password).then(() => {
-            expect(logic.__userId__).to.exist;
-            expect(logic.__userApiToken__).to.exist;
+            expect(logic.__storage__.userId).to.exist;
+            expect(logic.__storage__.userApiToken).to.exist;
             }));
     
         it("should fail on wrong email", () =>
@@ -120,6 +122,7 @@ describe("logic testing", () => {
         let email;
         const password = "123";
         const passwordConfirm = password;
+        const logic = new Logic
     
     
         beforeEach(() => {
@@ -142,6 +145,7 @@ describe("logic testing", () => {
             const password = "123";
             const passwordConfirm = password;
             const data = { favourites: [{ id: "1011334", name: "3-D Man" }] };
+            const logic = new Logic
         
             beforeEach(() => {
               email = `manuelbarzi@mail.com-${Math.random()}`;
