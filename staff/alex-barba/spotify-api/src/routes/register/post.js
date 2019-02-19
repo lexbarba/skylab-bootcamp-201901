@@ -5,7 +5,7 @@ module.exports = (req, res) => {
 
     try {
         logic.registerUser(name, surname, email, password, passwordConfirm)
-            .then(res.json.bind(res))
+            .then(id => res.json({ id }))
             .catch(({ message }) => {
                 res.status(401).json({
                     error: message
