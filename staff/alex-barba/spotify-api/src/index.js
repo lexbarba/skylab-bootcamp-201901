@@ -6,7 +6,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const spotifyApi = require('./spotify-api')
 
-const { registerUser, authenticateUser, retrieveUser, notFound, searchArtists, retrieveArtist, retrieveAlbums, retrieveAlbum, retrieveTracks, retrieveTrack } = require('./routes')
+const { registerUser, authenticateUser, retrieveUser, searchArtists, notFound } = require('./routes')
 
 const { env: { PORT, SPOTIFY_API_TOKEN }, argv: [, , port = PORT || 8080] } = process
 
@@ -22,22 +22,24 @@ router.post('/user', jsonBodyParser, registerUser)
 
 router.post('/user/auth', jsonBodyParser, authenticateUser)
 
-router.get('/user/:userId', retrieveUser)
+router.get('/user/:id', retrieveUser)
 
-router.get('/search', searchArtists)
+router.get('/artists', searchArtists)
 
-router.get('/artists/:artistId', retrieveArtist)
+// TODO add comment to artist
+// router.post('/artist/:id/comment', addCommentToArtist)
 
-router.get('/artists/:artistId/albums', retrieveAlbums)
+// TODO list comments from artist
+// router.get('/artist/:id/comment', listCommentsFromArtist)
 
-router.get('/albums/:albumId', retrieveAlbum)
+// router.get('/artist/:id', retrieveArtist)
 
-router.get('/albums/:albumId/tracks', retrieveTracks)
+// router.get('/album/:id', retrieveAlbum)
 
-router.get('/tracks/:trackId', retrieveTrack)
+// router.get('/track/:id', retrieveTrack)
+
+// app.get('*', notFound)
 
 app.use('/api', router)
-
-// app.get('*', notFound.get)
 
 app.listen(port, () => console.log(`server running on port ${port}`))

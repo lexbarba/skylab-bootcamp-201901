@@ -7,12 +7,12 @@ module.exports = (req, res) => {
         logic.registerUser(name, surname, email, password, passwordConfirm)
             .then(id => res.json({ id }))
             .catch(({ message }) => {
-                res.status(401).json({
+                res.status(409).json({
                     error: message
                 })
             })
     } catch ({ message }) {
-        res.status(401).json({
+        res.status(409).json({
             error: message
         })
     }

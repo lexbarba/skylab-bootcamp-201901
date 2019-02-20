@@ -2,6 +2,7 @@
 
 const spotifyApi = require('../spotify-api')
 const userApi = require('../user-api')
+const artistComment = require('../data/artist-comment')
 
 /**
  * Abstraction of business logic.
@@ -18,25 +19,15 @@ const logic = {
     */
     registerUser(name, surname, email, password, passwordConfirmation) {
         if (typeof name !== 'string') throw TypeError(name + ' is not a string')
-
         if (!name.trim().length) throw Error('name cannot be empty')
-
         if (typeof surname !== 'string') throw TypeError(surname + ' is not a string')
-
         if (!surname.trim().length) throw Error('surname cannot be empty')
-
         if (typeof email !== 'string') throw TypeError(email + ' is not a string')
-
         if (!email.trim().length) throw Error('email cannot be empty')
-
         if (typeof password !== 'string') throw TypeError(password + ' is not a string')
-
         if (!password.trim().length) throw Error('password cannot be empty')
-
         if (typeof passwordConfirmation !== 'string') throw TypeError(passwordConfirmation + ' is not a string')
-
         if (!passwordConfirmation.trim().length) throw Error('password confirmation cannot be empty')
-
         if (password !== passwordConfirmation) throw Error('passwords do not match')
 
         return userApi.register(name, surname, email, password)
@@ -49,13 +40,9 @@ const logic = {
      * @param {string} password 
      */
     authenticateUser(email, password) {
-        debugger
         if (typeof email !== 'string') throw TypeError(email + ' is not a string')
-
         if (!email.trim().length) throw Error('email cannot be empty')
-
         if (typeof password !== 'string') throw TypeError(password + ' is not a string')
-
         if (!password.trim().length) throw Error('password cannot be empty')
 
         return userApi.authenticate(email, password)
@@ -84,7 +71,6 @@ const logic = {
      */
     searchArtists(query) {
         if (typeof query !== 'string') throw TypeError(`${query} is not a string`)
-
         if (!query.trim().length) throw Error('query is empty')
 
         return spotifyApi.searchArtists(query)
@@ -97,10 +83,15 @@ const logic = {
      */
     retrieveArtist(artistId) {
         if (typeof artistId !== 'string') throw TypeError(`${artistId} is not a string`)
-
         if (!artistId.trim().length) throw Error('artistId is empty')
 
         return spotifyApi.retrieveArtist(artistId)
+        // TODO once artistComment is already implemented
+        // .then(artist =>
+        //     artistComment.find({ artistId: artist.id })
+        //         .then(comments => artist.comments = comments)
+        //         .then(() => artist)
+        // )
     },
 
     /**
@@ -109,6 +100,13 @@ const logic = {
      * @param {string} artistId - The id of the artist to toggle in favorites.
      */
     toggleFavoriteArtist(userId, token, artistId) {
+        if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
+        if (!userId.trim().length) throw Error('userId is empty')
+        if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
+        if (!token.trim().length) throw Error('token is empty')
+        if (typeof artistId !== 'string') throw TypeError(`${artistId} is not a string`)
+        if (!artistId.trim().length) throw Error('artistId is empty')
+
         return userApi.retrieve(userId, token)
             .then(user => {
                 const { favoriteArtists = [] } = user
@@ -122,6 +120,34 @@ const logic = {
             })
     },
 
+    addCommentToArtist(userId, token, artistId, text) {
+        if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
+        if (!userId.trim().length) throw Error('userId is empty')
+        if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
+        if (!token.trim().length) throw Error('token is empty')
+        if (typeof artistId !== 'string') throw TypeError(`${artistId} is not a string`)
+        if (!artistId.trim().length) throw Error('artistId is empty')
+        if (typeof text !== 'string') throw TypeError(`${text} is not a string`)
+        if (!text.trim().length) throw Error('text is empty')
+
+        const comment = {
+            userId,
+            artistId,
+            text
+        }
+
+        return userApi.retrieve(userId, token)
+            .then(() => artistComment.add(comment))
+            .then(() => comment.id)
+    },
+
+    listCommentsFromArtist(artistId) {
+        if (typeof artistId !== 'string') throw TypeError(`${artistId} is not a string`)
+        if (!artistId.trim().length) throw Error('artistId is empty')
+
+        return artistComment.find({ artistId })
+    },
+
     /**
      * Retrieves albums from artist.
      * 
@@ -129,7 +155,6 @@ const logic = {
      */
     retrieveAlbums(artistId) {
         if (typeof artistId !== 'string') throw TypeError(`${artistId} is not a string`)
-
         if (!artistId.trim().length) throw Error('artistId is empty')
 
         return spotifyApi.retrieveAlbums(artistId)
@@ -142,7 +167,6 @@ const logic = {
      */
     retrieveAlbum(albumId) {
         if (typeof albumId !== 'string') throw TypeError(`${albumId} is not a string`)
-
         if (!albumId.trim().length) throw Error('albumId is empty')
 
         return spotifyApi.retrieveAlbum(albumId)
@@ -154,6 +178,13 @@ const logic = {
      * @param {string} albumId - The id of the album to toggle in favorites.
      */
     toggleFavoriteAlbum(userId, token, albumId) {
+        if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
+        if (!userId.trim().length) throw Error('userId is empty')
+        if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
+        if (!token.trim().length) throw Error('token is empty')
+        if (typeof albumId !== 'string') throw TypeError(`${albumId} is not a string`)
+        if (!albumId.trim().length) throw Error('albumId is empty')
+
         return userApi.retrieve(userId, token)
             .then(user => {
                 const { favoriteAlbums = [] } = user
@@ -174,7 +205,6 @@ const logic = {
      */
     retrieveTracks(albumId) {
         if (typeof albumId !== 'string') throw TypeError(`${albumId} is not a string`)
-
         if (!albumId.trim().length) throw Error('albumId is empty')
 
         return spotifyApi.retrieveTracks(albumId)
@@ -187,7 +217,6 @@ const logic = {
      */
     retrieveTrack(trackId) {
         if (typeof trackId !== 'string') throw TypeError(`${trackId} is not a string`)
-
         if (!trackId.trim().length) throw Error('trackId is empty')
 
         return spotifyApi.retrieveTrack(trackId)
@@ -199,6 +228,13 @@ const logic = {
      * @param {string} trackId - The id of the track to toggle in favorites.
      */
     toggleFavoriteTrack(userId, token, trackId) {
+        if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
+        if (!userId.trim().length) throw Error('userId is empty')
+        if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
+        if (!token.trim().length) throw Error('token is empty')
+        if (typeof trackId !== 'string') throw TypeError(`${trackId} is not a string`)
+        if (!trackId.trim().length) throw Error('trackId is empty')
+
         return userApi.retrieve(userId, token)
             .then(user => {
                 const { favoriteTracks = [] } = user

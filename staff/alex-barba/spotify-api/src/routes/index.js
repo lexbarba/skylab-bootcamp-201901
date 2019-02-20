@@ -1,30 +1,26 @@
 module.exports = {
-    registerUser: {
+    register: {
         post: require('./register-user')
     },
 
-    authenticateUser: {
+    authenticate: {
         post: require('./authenticate-user')
     },
 
-    retrieveUser: {
+    retrieve: {
         get: require('./retrieve-user')
+    },
+
+    notFound: {
+        get: require('./not-found')
     },
 
     searchArtists: {
         get: require('./search-artists')
     },
 
-    retrieveArtist: {
-        get: require('./retrieve-artist')
-    },
-
     retrieveAlbums: {
         get: require('./retrieve-albums')
-    },
-
-    retrieveAlbum: {
-        get: require('./retrieve-album')
     },
 
     retrieveTracks: {
@@ -33,9 +29,5 @@ module.exports = {
 
     retrieveTrack: {
         get: require('./retrieve-track')
-    },
-
-    // notFound: {
-    //     get: require('./not-found')
-    // }
+    }
 }
