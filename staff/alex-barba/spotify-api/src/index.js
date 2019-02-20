@@ -6,7 +6,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const spotifyApi = require('./spotify-api')
 
-const { register, authenticate, retrieve, notFound, searchArtists, retrieveArtist, retrieveAlbums, retrieveAlbum, retrieveTracks, retrieveTrack } = require('./routes')
+const { registerUser, authenticateUser, retrieveUser, notFound, searchArtists, retrieveArtist, retrieveAlbums, retrieveAlbum, retrieveTracks, retrieveTrack } = require('./routes')
 
 const { env: { PORT, SPOTIFY_API_TOKEN }, argv: [, , port = PORT || 8080] } = process
 
@@ -18,23 +18,23 @@ const jsonBodyParser = bodyParser.json()
 
 const router = express.Router()
 
-router.post('/user', jsonBodyParser, register.post)
+router.post('/user', jsonBodyParser, registerUser)
 
-router.post('/user/auth', jsonBodyParser, authenticate.post)
+router.post('/user/auth', jsonBodyParser, authenticateUser)
 
-router.get('/user/:userId', retrieve.get)
+router.get('/user/:userId', retrieveUser)
 
-router.get('/search', searchArtists.get)
+router.get('/search', searchArtists)
 
-router.get('/artists/:artistId', retrieveArtist.get)
+router.get('/artists/:artistId', retrieveArtist)
 
-router.get('/artists/:artistId/albums', retrieveAlbums.get)
+router.get('/artists/:artistId/albums', retrieveAlbums)
 
-router.get('/albums/:albumId', retrieveAlbum.get)
+router.get('/albums/:albumId', retrieveAlbum)
 
-router.get('/albums/:albumId/tracks', retrieveTracks.get)
+router.get('/albums/:albumId/tracks', retrieveTracks)
 
-router.get('/tracks/:trackId', retrieveTrack.get)
+router.get('/tracks/:trackId', retrieveTrack)
 
 app.use('/api', router)
 

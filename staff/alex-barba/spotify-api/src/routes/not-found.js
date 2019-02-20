@@ -1,3 +1,4 @@
+
 const { renderPage } = require('../helpers')
 
 module.exports = (req, res) =>

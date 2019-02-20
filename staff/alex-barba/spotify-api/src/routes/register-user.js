@@ -1,11 +1,11 @@
-const logic = require('../../logic')
+const logic = require('../logic')
 
 module.exports = (req, res) => {
-    const {params:{ trackId }} = req
+    const { body: { name, surname, email, password, passwordConfirm } } = req
 
     try {
-        logic.retrieveTrack(trackId)
-            .then(res.json.bind(res))
+        logic.registerUser(name, surname, email, password, passwordConfirm)
+            .then(id => res.json({ id }))
             .catch(({ message }) => {
                 res.status(401).json({
                     error: message
