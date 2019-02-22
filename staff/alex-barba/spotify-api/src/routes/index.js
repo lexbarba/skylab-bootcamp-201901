@@ -1,33 +1,34 @@
 module.exports = {
-    register: {
-        post: require('./register-user')
-    },
 
-    authenticate: {
-        post: require('./authenticate-user')
-    },
+    registerUser: require('./register-user'),
 
-    retrieve: {
-        get: require('./retrieve-user')
-    },
+    authenticateUser: require('./authenticate-user'),
 
-    notFound: {
-        get: require('./not-found')
-    },
+    retrieveUser: require('./retrieve-user'),
 
-    searchArtists: {
-        get: require('./search-artists')
-    },
+    updateUser: require('./update-user'),
 
-    retrieveAlbums: {
-        get: require('./retrieve-albums')
-    },
+    searchArtists: require('./search-artists'),
 
-    retrieveTracks: {
-        get: require('./retrieve-tracks')
-    },
+    retrieveArtist: required('./retrieve-artist'),
 
-    retrieveTrack: {
-        get: require('./retrieve-track')
-    }
+    addCommentToArtist: require('./add-comment-to-artist'),
+
+    listCommentsFromArtist: require('./list-comments-from-artist'),
+
+    toggleFavoriteArtist: require('./toggle-favorite-artist'),
+   
+    retrieveAlbums: require('./retrieve-albums'),
+
+    retrieveAlbum: require('./retrieve-album'),
+    
+    retrieveTracks: require('./retrieve-tracks'),
+    
+    retrieveTrack: require('./retrieve-track'),
+
+    toggleFavoriteAlbum: require('./toggle-favorite-album'),
+
+    toggleFavoriteTrack: require('./toggle-favorite-track'),
+
+    notFound: require('./not-found'),
 }

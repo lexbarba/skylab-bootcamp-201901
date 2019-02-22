@@ -1,19 +1,18 @@
-const logic = require('../logic')
+const logic = require("../logic");
 
 module.exports = (req, res) => {
-    const { body: { email, password } } = req
-
+    const { params: { artistId } } = req
     try {
-        logic.authenticateUser(email, password)
+        logic.retrieveArtist(artistId)
             .then(res.json.bind(res))
             .catch(({ message }) => {
                 res.status(401).json({
                     error: message
-                })
-            })
+                });
+            });
     } catch ({ message }) {
         res.status(401).json({
             error: message
-        })
+        });
     }
-}
+};

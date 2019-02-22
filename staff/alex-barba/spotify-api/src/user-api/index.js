@@ -50,7 +50,7 @@ const userApi = {
             .then(response => response.json())
             .then(response => {
                 const { status } = response
-
+                debugger
                 if (status === 'OK') return response.data
 
                 throw Error(response.error)
@@ -86,6 +86,7 @@ const userApi = {
         if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
         if (!token.trim().length) throw Error('token is empty')
 
+        if (!data) throw Error('data is empty')
         if (data.constructor !== Object) throw TypeError(`${data} is not an object`)
 
         return fetch(`${this.url}/user/${id}`, {

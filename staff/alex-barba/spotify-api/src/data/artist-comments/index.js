@@ -2,7 +2,7 @@ const uuid = require('uuid/v4')
 const fsp = require('fs').promises // WARN need node v10+
 const path = require('path')
 
-const artistComment = {
+const artistComments = {
     file: 'artist-comments.json',
 
     __load__(file) {
@@ -15,25 +15,16 @@ const artistComment = {
     },
 
     add(comment) {
-        const { userId, artistId, text, date } = comment
 
-        if (typeof userId !== 'string') throw TypeError (`${userId} is not a string`)
-        if (!userId.trim().length) throw Error (`userId is empty`)
-        if (typeof artistId !== 'string') throw TypeError (`${artistId} is not a string`)
-        if (!artistId.trim().length) throw Error (`artistId is empty`)
-        if (typeof text !== 'string') throw TypeError (`${text} is not a string`)
-        if (!text.trim().length) throw Error (`text is empty`)
-        // if (!(date instanceof Date)) throw TypeError (`${date} is not a date`)
-        // if (date === undefined) throw Error (`date is empty`)
-
+        if (comment === undefined) throw Error('comment should be defined')
+        if (comment.constructor !== Object) throw TypeError(`${comment} should be an object`)
 
         const file = path.join(__dirname, this.file)
 
         return this.__load__(file)
             .then(comments => {
+                
                 comment.id = uuid()
-                comment.date = new Date
-
                 comments.push(comment)
 
                 return this.__save__(file, comments)
@@ -41,8 +32,8 @@ const artistComment = {
     },
 
     retrieve(id) {
-        if (typeof id !== 'string') throw TypeError (`${id} is not a string`)
-        if (!id.trim().length) throw Error (`id is empty`)
+        if (id === undefined) throw Error('id should be defined')
+        if (typeof id !== 'string') throw TypeError(`${id} should be a string`)
 
         const file = path.join(__dirname, this.file)
 
@@ -59,18 +50,9 @@ const artistComment = {
     },
 
     update(comment) {
-        const { id, userId, artistId, text, date } = comment
-
-        if (typeof id !== 'string') throw TypeError (`${id} is not a string`)
-        if (!id.trim().length) throw Error (`id is empty`)
-        if (typeof userId !== 'string') throw TypeError (`${userId} is not a string`)
-        if (!userId.trim().length) throw Error (`userId is empty`)
-        if (typeof artistId !== 'string') throw TypeError (`${artistId} is not a string`)
-        if (!artistId.trim().length) throw Error (`artistId is empty`)
-        if (typeof text !== 'string') throw TypeError (`${text} is not a string`)
-        if (!text.trim().length) throw Error (`text is empty`)
-        if (!(date instanceof Date)) throw TypeError (`${date} is not a date`)
-        if (date === undefined) throw Error (`date is empty`)
+        
+        if (comment === undefined) throw Error('comment should be defined')
+        if (comment.constructor !== Object) throw TypeError(`${comment} should be an object`)
 
         const file = path.join(__dirname, this.file)
 
@@ -87,8 +69,9 @@ const artistComment = {
     },
 
     remove(id) {
-        if (typeof id !== 'string') throw TypeError (`${id} is not a string`)
-        if (!id.trim().length) throw Error (`id is empty`)
+
+        if (id === undefined) throw Error('id should be defined')
+        if (typeof id !== 'string') throw TypeError(`${id} should be a string`)
 
         const file = path.join(__dirname, this.file)
 
@@ -106,30 +89,30 @@ const artistComment = {
 
     removeAll() {
         const file = path.join(__dirname, this.file)
-
+        
         return this.__save__(file, [])
     },
 
     find(criteria) {
-        if (criteria.constructor !== Object) throw TypeError(`${criteria} is not an object`)
-        if (!Object.keys(criteria).length) throw Error (`criteria is empty`)
+
+        if (criteria === undefined) throw Error('criteria should be defined')
+        if (criteria.constructor !== Object) throw TypeError(`${criteria} should be an object`)
 
         const file = path.join(__dirname, this.file)
 
         return this.__load__(file)
             .then(comments => {
+                
                 const filtered = comments.filter(comment => {
                     for (const key in criteria)
                         if (comment[key] !== criteria[key]) return false
 
                     return true
                 })
-
                 filtered.forEach(comment => comment.date = new Date(comment.date))
-
                 return filtered
             })
     }
 }
 
-module.exports = artistComment
+module.exports = artistComments

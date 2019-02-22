@@ -1,18 +1,18 @@
 const logic = require('../logic')
 
 module.exports = (req, res) => {
-    const { body: { email, password } } = req
+    const { params: { artistId } } = req
 
     try {
-        logic.authenticateUser(email, password)
-            .then(res.json.bind(res))
+        logic.listCommentsFromArtist(artistId)
+            .then(comments => res.json(comments))
             .catch(({ message }) => {
-                res.status(401).json({
+                res.status(404).json({
                     error: message
                 })
             })
     } catch ({ message }) {
-        res.status(401).json({
+        res.status(404).json({
             error: message
         })
     }
