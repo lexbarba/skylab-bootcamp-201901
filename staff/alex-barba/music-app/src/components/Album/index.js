@@ -1,6 +1,14 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 export default function Album (props) {
+
+    const [comment, setComment] = useState(null)
+
+    const handleComment = () => {
+        const {onComment} = props
+
+        onComment(comment)
+    }
 
     const handleAlbumChosen = id => {
         const {onAlbum, feedback} = props
@@ -42,6 +50,26 @@ export default function Album (props) {
         </div>
         })
         }
+        <div className="comments columns is-mobile is-centered">
+        {   props.comments ?
+            props.comments.map(comments => {
+                return <div className="column cursor card is-three-quarters-mobile has-text-centered">
+                    <div className="card-content is-centered">
+                        <p className="title is-4">{comments.text}</p>
+                        <p className="subtitle is-6">User: {comments.userId}</p>
+                    </div>
+                </div>
+            }) : null
+        }
+        </div>
+        <div className="comments columns is-mobile is-centered">
+            <div className="column cursor card is-three-quarters-mobile has-text-centered">
+                <div className="card-content is-centered">
+                    <textarea className="title is-4" placeholder="Add your comment!" onChange={e => setComment(e.target.value)}></textarea>
+                    <button className="button is-large is-white"  onClick={() => handleComment()}>Send</button>
+                </div>
+            </div>
+        </div>
         </div>     
     </section>
     )

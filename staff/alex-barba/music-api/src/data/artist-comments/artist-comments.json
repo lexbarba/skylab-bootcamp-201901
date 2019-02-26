@@ -1,1 +1,92 @@
-[]
+[
+    {
+        "userId": "5c757275a374130dfae4a20e",
+        "text": "Hola!",
+        "date": "2019-02-26T18:24:23.099Z",
+        "id": "d7ad5e15-e3e9-40d4-bdcc-6b065e3dbbae"
+    },
+    {
+        "userId": "5c757275a374130dfae4a20e",
+        "text": "Hola!",
+        "date": "2019-02-26T18:24:37.998Z",
+        "id": "64071e7e-041c-47ea-b564-e4d914177200"
+    },
+    {
+        "userId": "5c757275a374130dfae4a20e",
+        "text": "Test 3!",
+        "date": "2019-02-26T18:29:21.164Z",
+        "id": "656c22cd-d1ed-4af7-b2fe-229925292838"
+    },
+    {
+        "userId": "5c757275a374130dfae4a20e",
+        "text": "xungo!",
+        "date": "2019-02-26T18:48:00.156Z",
+        "id": "adf555a6-6c4a-4476-aae1-00f352e303ff"
+    },
+    {
+        "userId": "5c757275a374130dfae4a20e",
+        "text": "marit mamon! saluda al cak",
+        "date": "2019-02-26T18:48:10.910Z",
+        "id": "391c4c41-bb31-4553-9caa-7f818da0030e"
+    },
+    {
+        "userId": "5c757275a374130dfae4a20e",
+        "text": "marit mamon! saluda al cak",
+        "date": "2019-02-26T18:48:27.490Z",
+        "id": "bea1be42-e4fb-4970-a71e-6a0babe113aa"
+    },
+    {
+        "userId": "5c757275a374130dfae4a20e",
+        "text": "marit mamon! saluda al cak",
+        "date": "2019-02-26T18:48:29.456Z",
+        "id": "bf35c0eb-9168-46ec-ba2c-e097489938a7"
+    },
+    {
+        "userId": "5c757275a374130dfae4a20e",
+        "text": "marit mamon! saluda al cak",
+        "date": "2019-02-26T18:48:30.695Z",
+        "id": "fa1b185e-d318-4cdf-86a0-f11854e3eb2f"
+    },
+    {
+        "userId": "5c757275a374130dfae4a20e",
+        "text": "marit mamon! saluda al cak",
+        "date": "2019-02-26T18:48:32.038Z",
+        "id": "79d0d172-84f9-4f50-a541-98c8a4d563c0"
+    },
+    {
+        "userId": "5c757275a374130dfae4a20e",
+        "text": "marit mamon! saluda al cak",
+        "date": "2019-02-26T18:48:33.050Z",
+        "id": "0105e2dc-f901-44e1-a1a1-70ab1438dddd"
+    },
+    {
+        "userId": "5c757275a374130dfae4a20e",
+        "text": "marit mamon! saluda al cak",
+        "date": "2019-02-26T18:48:34.254Z",
+        "id": "a0a09a46-2557-436e-b953-ed9dad3024e6"
+    },
+    {
+        "userId": "5c757275a374130dfae4a20e",
+        "text": "marit mamon! saluda al cak",
+        "date": "2019-02-26T18:48:35.040Z",
+        "id": "3f41c104-8f1a-4467-bea0-9ebbfc457aee"
+    },
+    {
+        "userId": "5c757275a374130dfae4a20e",
+        "text": "marit mamon! saluda al cak",
+        "date": "2019-02-26T18:48:37.264Z",
+        "id": "aa6b3ca2-7b26-4a0e-9425-f3dbeeff2058"
+    },
+    {
+        "userId": "5c757275a374130dfae4a20e",
+        "text": "marit mamon! saluda al cak",
+        "date": "2019-02-26T18:48:37.647Z",
+        "id": "3d0a7da0-1cac-4b9e-b22e-018535c48bc2"
+    },
+    {
+        "userId": "5c757275a374130dfae4a20e",
+        "text": "marit mamon! saluda al cak",
+        "date": "2019-02-26T18:48:39.967Z",
+        "id": "09229ea0-6544-47e6-b8fe-a5f3ed721db7"
+    }
+]

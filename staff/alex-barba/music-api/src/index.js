@@ -45,21 +45,21 @@ MongoClient.connect(DB_URL, { useNewUrlParser: true })
 
         router.get('/artist/:id', retrieveArtist)
 
-        router.post('/artist/:id/comment', addCommentToArtist)
+        router.post('/artist/:id/comment', jsonBodyParser,addCommentToArtist)
 
         router.get('/artist/:id/comment', listCommentsFromArtist)
 
         router.post('/user/favoriteArtists', jsonBodyParser, toggleFavoriteArtist)
 
-        router.post('/artist/:id/albums', jsonBodyParser, retrieveAlbums)
+        router.get('/artist/:id/albums', retrieveAlbums)
 
         router.get('/album/:id', retrieveAlbum)
 
         // router.post('/album/:id', toggleFavoriteAlbum)
 
-        router.post('/tracks/:id', jsonBodyParser, retrieveTracks)
+        router.get('/tracks/:id', retrieveTracks)
 
-        router.post('/track/:id', jsonBodyParser, retrieveTrack)
+        router.get('/track/:id', retrieveTrack)
 
         // router.post('/track/:id', toggleFavoriteTrack)
 

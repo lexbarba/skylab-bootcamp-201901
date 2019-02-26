@@ -190,12 +190,30 @@ const logic = {
      * @param {string} artistId - The id of the artist to toggle in favorites.
      */
     toggleFavoriteArtist(artistId) {
-        if  (typeof artistId !== 'string') throw TypeError (`${artistId} is not a string`)
-        
+        if  (typeof artistId !== 'string') throw TypeError (`${artistId} is not a string`)       
         if (!artistId.trim().length) throw Error('artistId is empty')
 
         return musicApi.toggleFavoriteArtist(this.__userId__, this.__userApiToken__, artistId)
     },
+
+    addCommentToArtist(artistId, text){
+        if  (typeof artistId !== 'string') throw TypeError (`${artistId} is not a string`)     
+        if (!artistId.trim().length) throw Error('artistId is empty')
+
+        if  (typeof text !== 'string') throw TypeError (`${text} is not a string`)  
+        if (!text.trim().length) throw Error('text is empty')
+
+        return musicApi.addCommentToArtist(this.__userId__, this.__userApiToken__, artistId, text)
+
+
+    },
+
+    listCommentsFromArtist(artistId){
+        if  (typeof artistId !== 'string') throw TypeError (`${artistId} is not a string`)  
+        if (!artistId.trim().length) throw Error('artistId is empty')
+
+        return musicApi.listCommentsFromArtist(this.__userId__, this.__userApiToken__, artistId)
+    }
 }
 
 export default logic;

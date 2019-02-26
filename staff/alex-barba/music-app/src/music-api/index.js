@@ -292,7 +292,75 @@
         })
             .then(response => response.json())
             .then(response => response)
-    }
+    },
+
+    /**
+     * 
+     * Adds comment to Artist.
+     * 
+     * @param {*} id 
+     * @param {*} token 
+     * @param {*} object 
+     */
+
+    addCommentToArtist(userId, token, artistId, text) {
+
+        if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
+        if (!userId.trim().length) throw Error('id is empty')
+
+        if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
+        if (!token.trim().length) throw Error('token is empty')
+
+        if (typeof artistId !== 'string') throw TypeError(`${artistId} is not a string`)
+        if (!artistId.trim().length) throw Error('artistId is empty')
+
+        if (typeof text !== 'string') throw TypeError(`${text} is not a string`)
+        if (!text.trim().length) throw Error('text is empty')
+
+        return fetch(`http://localhost:8000/api/artist/${artistId}/comment`, { 
+            method: 'POST', 
+            headers: {
+                authorization: `Bearer ${token}`,
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({ userId, text }),
+        })
+            .then(response => response.json())
+            .then(response => {
+                if (response) return response
+                else throw Error(response.error)
+            })
+    },
+
+    /**
+     * 
+     * Lists comments to Artist.
+     * 
+     * @param {*} id 
+     * @param {*} token 
+     * @param {*} object 
+     */
+
+    listCommentsFromArtist(token, artistId) {
+
+        if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
+        if (!token.trim().length) throw Error('token is empty')
+
+        if (typeof artistId !== 'string') throw TypeError(`${artistId} is not a string`)
+        if (!artistId.trim().length) throw Error('artistId is empty')
+
+        return fetch(`http://localhost:8000/api/artist/${artistId}/comment`, { 
+            method: 'GET', 
+            headers: {
+                authorization: `Bearer ${token}`,
+            },
+        })
+            .then(response => response.json())
+            .then(response => {
+                if (response) return response
+                else throw Error(response.error)
+            })
+    },
 
 }
 
