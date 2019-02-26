@@ -1,44 +1,49 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 
-class Artist extends React.Component {
+export default function Artist(props) {
 
-    handleArtist = (id) => {
+    const handleArtist = (id) => {
 
-        const{ props: {onArtist, feedback}} = this
+        const { onArtist } = props
 
-        onArtist(id, feedback)
+        onArtist(id)
     }
-    
-    render() {  
-        const {props: { artists }, handleArtist} = this
-    
-        return <section className="resultsArtist container margin-top">
-        <div className="columns is-mobile is-multiline is-centered">
 
-        {
-        artists.map(({ id, name, images, popularity, genres }) => {
-            const genre = genres[0] ? genres[0] : 'No genre defined'
-            const image = images[0] ? images[0].url :  'https://developer.spotify.com/assets/branding-guidelines/icon3@2x.png'
-            
-            return <div key={id} onClick={() => handleArtist(id)} data-id={id} className="column cursor card is-one-third-widescreen is-two-fifths-tablet is-three-quarters-mobile has-text-centered">
-                <div className="hover card-image">
-                    <figure className="image is-centered">
-                        <img src={image} />
-                    </figure>
-                </div>
-                <div className="card-content is-centered">
-                    <h4 className="title is-4">{name}</h4>
-                    <h5 className="subtitle is-6">Popularity Index :#{popularity}</h5>
-                </div>
-                <div className="card-footer">
-                    <p className="subtitle is-6">Genre: {genre}</p>
-                </div>
+    const handleFavorite = (id) => {
+
+        const { onToggleFavorite } = props
+
+        onToggleFavorite(id)
+    }
+
+    return (
+        <section className="resultsArtist container margin-top">
+            <div className="columns is-mobile is-multiline is-centered">
+
+                {
+                    props.artists.map(({ id, name, images, popularity, genres, isFavorite }) => {
+                        const genre = genres[0] ? genres[0] : 'No genre defined'
+                        const image = images[0] ? images[0].url : 'https://developer.spotify.com/assets/branding-guidelines/icon3@2x.png'
+                        const heart = isFavorite ? <img className="icon" src="https://image.flaticon.com/icons/svg/148/148836.svg" />: <img className="icon" src="https://image.flaticon.com/icons/svg/149/149217.svg" />
+
+                        return <div key={id} data-id={id} className="column cursor card is-one-third-widescreen is-two-fifths-tablet is-three-quarters-mobile has-text-centered">
+                            <div className="hover card-image">
+                                <figure className="image is-centered">
+                                    <img onClick={() => handleArtist(id)} src={image} />
+                                </figure>
+                            </div>
+                            <div className="card-content is-centered">
+                                <h4 className="title is-4">{name}</h4>
+                                <button className="button is-large is-white"  onClick={() => handleFavorite(id)}>{heart}</button>
+                                <h5 className="subtitle is-6">Popularity Index :#{popularity}</h5>
+                            </div>
+                            <div className="card-footer">
+                                <p className="subtitle is-6">Genre: {genre}</p>
+                            </div>
+                        </div>
+                    })
+                }
             </div>
-            })
-        }
-        </div> 
-    </section>
-    }
+        </section>
+    )
 }
-
-export default Artist;

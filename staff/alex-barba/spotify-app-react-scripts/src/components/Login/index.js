@@ -1,69 +1,56 @@
-import React from 'react';
-import Feedback from '../Feedback';
+import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import Feedback from '../Feedback'
 
-class Login extends React.Component {
-    state = {email: '', password: ''}
+export default function Login({feedback, onLogin}) {
 
-    handleEmailInput = event => this.setState({email: event.target.value})
+    const [email, setEmail] = useState(null)
+    const [password, setPassword] = useState(null)
 
-    handlePasswordInput = event => this.setState({password: event.target.value})
-
-    handleFormSubmit = event => {
+    const handleFormSubmit = event => {
         event.preventDefault()
-
-        const { state: { email, password}, props: { onLogin } } = this
 
         onLogin(email, password)
     }
 
-    handleOnRegister = () => {
-        const { props: {onToRegister} } = this
 
-        onToRegister()
-    }
-
-    render(){
-
-        const { handleEmailInput, handlePasswordInput, handleFormSubmit, handleOnRegister, props: {feedback} } = this
-        
-        return <section className="login container margin-top" >
-        <div className="columns is-mobile is-centered">
-            <form className="login__form column is-half-widescreen is-half-tablet is-three-quarters-mobile is-centered" onSubmit={handleFormSubmit}>
-                <h4 className="subtitle is-4">Login</h4>
-                <div className="field">
-                    <p className="control has-icons-left has-icons-right">
-                        <input className="input is-small is-rounded" type="email" name="email" placeholder="Email" required onChange={handleEmailInput}/>
-                        <span className="icon is-small is-left">
-                            <i className="fas fa-envelope"></i>
-                        </span>
-                        <span className="icon is-small is-right">
-                            <i className="fas fa-check"></i>
-                        </span>
-                    </p>
-                </div>
-                <div className="field">
-                    <p className="control has-icons-left">
-                        <input className="input is-small is-rounded" type="password" name="password" placeholder="Password" required onChange={handlePasswordInput} />
-                        <span className="icon is-small is-left">
-                            <i className="fas fa-lock"></i>
-                        </span>
-                    </p>
-                </div>
-                <div className="field is-grouped btn_grp">
-                    <p className="control">
-                        <button className="button is-success is-small is-rounded" type="submit">
-                        Login
+    return (
+        <section className="login container margin-top" >
+            <div className="columns is-mobile is-centered">
+                <form className="login__form column is-half-widescreen is-half-tablet is-three-quarters-mobile is-centered" onSubmit={handleFormSubmit}>
+                    <h4 className="subtitle is-4">Login</h4>
+                    <div className="field">
+                        <p className="control has-icons-left has-icons-right">
+                            <input className="input is-small is-rounded" type="email" name="email" placeholder="Email" required onChange={e => setEmail(e.target.value)} />
+                            <span className="icon is-small is-left">
+                                <i className="fas fa-envelope"></i>
+                            </span>
+                            <span className="icon is-small is-right">
+                                <i className="fas fa-check"></i>
+                            </span>
+                        </p>
+                    </div>
+                    <div className="field">
+                        <p className="control has-icons-left">
+                            <input className="input is-small is-rounded" type="password" name="password" placeholder="Password" required onChange={e => setPassword(e.target.value)} />
+                            <span className="icon is-small is-left">
+                                <i className="fas fa-lock"></i>
+                            </span>
+                        </p>
+                    </div>
+                    <div className="field is-grouped btn_grp">
+                        <p className="control">
+                            <button className="button is-success is-small is-rounded" type="submit">
+                                Login
                         </button>
-                    </p>
-                    <p className="control"
-                        ><a href="#" onClick={handleOnRegister} className="button is-outlined is-small is-rounded" >Register</a>
-                    </p>
-                </div>
-            </form>
-        </div>
-        {feedback && <Feedback message={feedback} />}
-    </section> 
-    }
+                        </p>
+                        <p className="control">
+                            <Link to="/register" className="button is-outlined is-small is-rounded">Register</Link>
+                        </p>
+                    </div>
+                </form>
+            </div>
+            {feedback && <Feedback message={feedback} />}
+        </section>
+    )
 }
-
-export default Login;

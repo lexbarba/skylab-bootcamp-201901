@@ -1,5 +1,4 @@
-import userApi from '../user-api/index'
-import spotifyApi from '../spotify-api/index';
+import musicApi from '../music-api/index'
 
 /**
  * logic.js of the Spotify App
@@ -9,35 +8,29 @@ import spotifyApi from '../spotify-api/index';
 
 const logic = {
 
+    __userId__: null,
+    __userApiToken__: null,
+
     /**
      * Logins a user by its credentials.
      * 
      * @param {string} email 
      * @param {string} password 
-     * @param {function} callback 
      */
 
-    login: function (email, password, callback) {
+    login: function (email, password) {
         if (typeof email !== 'string') throw TypeError(email + ' is not a string')
         if (!email.trim().length) throw Error('email cannot be empty')
 
         if (typeof password !== 'string') throw TypeError(password + ' is not a string')
         if (!password.trim().length) throw Error('password cannot be empty')
 
-        var user = users.find(function (user) {
-            return user.email === email
-        })
-
-        if (!user) throw Error('user ' + email + ' not found')
-        if (user.password !== password) throw Error('wrong password')
-
-        var loggedInUser = {
-            name: user.name,
-            surname: user.surname,
-            email: user.email,
-            favourites: user.favourites
-        }
-        callback(loggedInUser)
+        return musicApi.authenticate(email, password)
+            .then(res => {
+                this.__userId__ = res.id
+                this.__userApiToken__= res.token
+                return res
+            })
     },
 
     /**
@@ -47,11 +40,10 @@ const logic = {
      * @param {string} surname 
      * @param {string} email 
      * @param {string} password 
-     * @param {string} passwordConfirmation 
-     * @param {function} callback 
+     * @param {string} passwordConfirmation  
      */
 
-    register: function (name, surname, email, password, passwordConfirmation, callback) {
+    register: function (name, surname, email, password, passwordConfirmation) {
         if (typeof name !== 'string') throw TypeError(name + ' is not a string')
 
         if (!name.trim().length) throw Error('name cannot be empty')
@@ -72,125 +64,144 @@ const logic = {
 
         if (!passwordConfirmation.trim().length) throw Error('password confirmation cannot be empty')
 
-        var user = users.find(function (user) {
-            return user.email === email
-        })
-
-        if (user) throw Error('user ' + email + ' already exists')
-
         if (password !== passwordConfirmation) throw Error('passwords do not match')
 
-        users.push({
-            name: name,
-            surname: surname,
-            email: email,
-            password: password,
-            favourites: []
-        })
-
-        callback()
+        return musicApi.register(name, surname, email, password, passwordConfirmation)
+            .then(() => { })
     },
 
-    /* TO COMMENT */
-
-    retrieveFavourites: function ( id, title, email, callback) {
-        if (typeof email !== 'string') throw TypeError(email + ' is not a string')
-        if (!email.trim().length) throw Error('email cannot be empty')
-
-        if (typeof id !== 'string') throw TypeError(id + ' is not a string')
-        if (!id.trim().length) throw Error('id cannot be empty')
-
-        var user = users.find(function (user) {
-            return user.email === email
-        })
-        console.log(user)
-
-        if (!user) throw Error('user ' + email + ' not found')
-
-        var exists = user.favourites.findIndex(obj => obj.id === id)
-        let toSend = {id, title}
-
-        if (exists !== -1) {
-            user.favourites.splice(exists, 1)
-            callback(user.favourites)   
-            return false
-        } else {
-            user.favourites.push(toSend)
-            callback(user.favourites)
-            return true
-        }
+    /**
+     * Checks user is logged in.
+     */
+    get isUserLoggedIn() {
+        return !!this.__userId__
     },
+
+    /**
+     * Logs out the user.
+     */
+    logOutUser() {
+        this.__userId__ = null
+        this.__userApiToken__ = null
+    },
+    
+    retrieveUser() {
+        return musicApi.retrieve(this.__userId__, this.__userApiToken__)
+        .then(({ id, name, surname, email, favoriteArtists = [], favoriteAlbums = [], favoriteTracks = [] }) => ({
+            id,
+            name,
+            surname,
+            email,
+            favoriteArtists,
+            favoriteAlbums,
+            favoriteTracks
+        }))
+    },
+
+    // retrieveFavourites: function ( id, title, email, callback) {
+    //     if (typeof email !== 'string') throw TypeError(email + ' is not a string')
+    //     if (!email.trim().length) throw Error('email cannot be empty')
+
+    //     if (typeof id !== 'string') throw TypeError(id + ' is not a string')
+    //     if (!id.trim().length) throw Error('id cannot be empty')
+
+    //     var user = users.find(function (user) {
+    //         return user.email === email
+    //     })
+    //     console.log(user)
+
+    //     if (!user) throw Error('user ' + email + ' not found')
+
+    //     var exists = user.favourites.findIndex(obj => obj.id === id)
+    //     let toSend = {id, title}
+
+    //     if (exists !== -1) {
+    //         user.favourites.splice(exists, 1)
+    //         callback(user.favourites)   
+    //         return false
+    //     } else {
+    //         user.favourites.push(toSend)
+    //         callback(user.favourites)
+    //         return true
+    //     }
+    // },
 
     /**
      * Search artists.
      * 
-     * @param {string} query 
-     * @param {function} callback 
+     * @param {string} query  
      */
     
-    searchArtists(query, callback) {
+    searchArtists(query) {
         if  (typeof query !== 'string') throw TypeError (`${query} is not a string`)
         
         if (query === undefined) throw Error (`No results for ${query}`)
 
-        console.log(query)
-
         if (!query.trim().length) throw Error('query is empty')
 
-        if (typeof callback !== 'function') throw TypeError(`${callback} is not a function`)
-
-        spotifyApi.searchArtists(query, callback)
+        return musicApi.searchArtists(query)
     },
 
      /**
      * Search albums from the previous selected artist.
      * 
-     * @param {string} artistId
-     * @param {function} callback 
+     * @param {string} artistId 
      */
 
-    retrieveAlbums(artistId, callback) {
+    retrieveAlbums(artistId) {
         if  (typeof artistId !== 'string') throw TypeError (`${artistId} is not a string`)
         
         if (!artistId.trim().length) throw Error('artist is empty')
 
-        if (typeof callback !== 'function') throw TypeError(`${callback} is not a function`)
-
-        spotifyApi.retrieveAlbums(artistId, callback)
+        return musicApi.retrieveAlbums(artistId)
     },
 
      /**
      * Search tracks from the previous selected album.
      * 
-     * @param {string} albumId
-     * @param {function} callback 
+     * @param {string} albumId 
      */
 
-    retrieveTracks(albumId, callback) {
+    retrieveTracks(albumId) {
         if  (typeof albumId !== 'string') throw TypeError (`${albumId} is not a string`)
         
         if (!albumId.trim().length) throw Error('album is empty')
 
-        if (typeof callback !== 'function') throw TypeError(`${callback} is not a function`)
-
-        spotifyApi.retrieveTracks(albumId, callback)
+        return musicApi.retrieveTracks(albumId)
     },
 
      /**
      * Search track from the previous selected list of tracks.
      * 
-     * @param {string} trackId
-     * @param {function} callback 
+     * @param {string} trackId 
      */
 
-    retrieveTrack(trackId, callback) {
+    retrieveTrack(trackId) {
         if  (typeof trackId !== 'string') throw TypeError (`${trackId} is not a string`)
         
         if (!trackId.trim().length) throw Error('track is empty')
 
-        if (typeof callback !== 'function') throw TypeError(`${callback} is not a function`)
+        return musicApi.retrieveTrack(trackId)
+    },
 
-        spotifyApi.retrieveTrack(trackId, callback)
+    /**
+     * Toggles a artist from non-favorite to favorite, and viceversa.
+     * 
+     * @param {string} artistId - The id of the artist to toggle in favorites.
+     */
+    toggleFavoriteArtist(artistId) {
+        return musicApi.retrieve(this.__userId__, this.__userApiToken__)
+            .then(user => {
+                debugger
+                const { favoriteArtists = [] } = user
+
+                const index = favoriteArtists.findIndex(_artistId => _artistId === artistId)
+
+                if (index < 0) favoriteArtists.push(artistId)
+                else favoriteArtists.splice(index, 1)
+
+                return musicApi.toggleFavoriteArtist(this.__userId__, this.__userApiToken__, { favoriteArtists })
+            })
     },
 
 }

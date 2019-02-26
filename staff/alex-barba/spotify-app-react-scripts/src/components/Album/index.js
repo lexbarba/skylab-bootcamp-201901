@@ -1,23 +1,20 @@
 import React from 'react';
 
-class Album extends React.Component {
+export default function Album (props) {
 
-    handleAlbumChosen = id => {
-        const{ props: {onAlbum, feedback}} = this
+    const handleAlbumChosen = id => {
+        const {onAlbum, feedback} = props
 
         onAlbum(id, feedback)
     }
 
-    handleBackToArtists = () => {
-        const { props: {onToArtists} } = this
+    const handleBackToArtists = () => {
+        const { onToArtists} = props
 
         onToArtists()
     }
-
-    render() {
-        const {props: {albums}, handleAlbumChosen, handleBackToArtists} = this
-
-        return <section className="resultsAlbum container margin-top">
+    return (
+    <section className="resultsAlbum container margin-top">
         <div className="level is-mobile">
             <h4 className="level-item">Albums</h4>
             <div className="level-item">
@@ -27,7 +24,7 @@ class Album extends React.Component {
         <div className="albums columns is-mobile is-multiline is-centered">
 
         {
-        albums.map(({ id, name, images, release_date, total_tracks }) =>{
+        props.albums.map(({ id, name, images, release_date, total_tracks }) =>{
             const image = images[0] ? images[0].url :  'https://developer.spotify.com/assets/branding-guidelines/icon3@2x.png'
             return <div onClick={() => handleAlbumChosen(id)} data-id={id} className="cursor column card is-one-third-widescreen is-two-fifths-tablet is-three-quarters-mobile is-centered">
             <div className="hover card-image">
@@ -45,9 +42,7 @@ class Album extends React.Component {
         </div>
         })
         }
-        </div> 
-        </section>
-    }
+        </div>     
+    </section>
+    )
 }
-
-export default Album;

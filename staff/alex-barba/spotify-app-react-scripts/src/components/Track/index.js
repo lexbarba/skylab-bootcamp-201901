@@ -1,35 +1,36 @@
 import React from 'react';
 
-class Track extends React.Component {
+export default function Track (props) {
 
-    handleBackToTracks = () => {
-        const { props: {onToTracks} } = this
+    const handleBackToTracks = () => {
+        const { onToTracks} = props
 
         onToTracks()
     }
 
-    handleFavourite = (id, name) => {
-        const {props: {onFavourite} } = this
+    const handleFavourite = (id, name) => {
+        const {onFavourite} = props
     
         onFavourite(id, name)
     }
 
-    render() {
-        const {props: {track: {id, name, preview_url, uri, album: {images}}, resultFavourite, userFavourites },handleBackToTracks, handleFavourite }= this
-        
-        const image = images[0] ? images[0].url :  'https://developer.spotify.com/assets/branding-guidelines/icon3@2x.png'
 
-        var heart = resultFavourite ? <img className="icon" src="https://image.flaticon.com/icons/svg/148/148836.svg" />: <img className="icon" src="https://image.flaticon.com/icons/svg/149/149217.svg" />
+    const {track: {id, name, preview_url, uri, album: {images}}}= props
+    
+    const image = images[0] ? images[0].url :  'https://developer.spotify.com/assets/branding-guidelines/icon3@2x.png'
 
-        if (userFavourites) {
-            heart = userFavourites.some(obj => obj.id === id) ? <img className="icon" src="https://image.flaticon.com/icons/svg/148/148836.svg" /> : <img className="icon" src="https://image.flaticon.com/icons/svg/149/149217.svg" />
-        }
-        
-        return <section className="trackChosen container margin-top">
+    // var heart = resultFavourite ? <img className="icon" src="https://image.flaticon.com/icons/svg/148/148836.svg" />: <img className="icon" src="https://image.flaticon.com/icons/svg/149/149217.svg" />
+
+    // if (userFavourites) {
+    //     heart = userFavourites.some(obj => obj.id === id) ? <img className="icon" src="https://image.flaticon.com/icons/svg/148/148836.svg" /> : <img className="icon" src="https://image.flaticon.com/icons/svg/149/149217.svg" />
+    // }
+    
+    return (
+        <section className="trackChosen container margin-top">
             <div className="level is-mobile">
                 <h4 className="level-item">Track</h4>
                 <div className="level-item">
-                    <button onClick={handleBackToTracks}className="button is-dark is-small is-rounded"><i className="fas fa-chevron-circle-left"></i>&nbsp;&nbsp;Back to Tracks</button>
+                    <button onClick={handleBackToTracks} className="button is-dark is-small is-rounded"><i className="fas fa-chevron-circle-left"></i>&nbsp;&nbsp;Back to Tracks</button>
                 </div>
             </div>
             <div className="columns is-centered">
@@ -39,9 +40,9 @@ class Track extends React.Component {
                 <div className="column has-text-centered">
                     <div className="content">
                         <h3 className="margin-top title is-3">{name}</h3>
-                        <button className="button is-large is-white"onClick={() => handleFavourite(id, name)}>
+                        {/* <button className="button is-large is-white"onClick={() => handleFavourite(id, name)}>
                             {heart}
-                        </button>
+                        </button> */}
                         <p>
                         <audio className="margin-top"src={preview_url} autoPlay controls></audio>
                         </p>
@@ -52,8 +53,5 @@ class Track extends React.Component {
                 </div>
             </div>  
         </section>
-        }
+    )
 }
-
-
-export default Track;

@@ -1,43 +1,35 @@
-import React from 'react';
-import Feedback from '../Feedback';
+import React, { useState, useEffect } from 'react'
+import {Link} from 'react-router-dom'
+import Feedback from '../Feedback'
+import ModalRegistration from '../ModalRegistration'
 
-class Register extends React.Component {
-    state = {name:'', surname:'', email:'', password:'', passwordConfirmation:''}
+export default function Register({modal, feedback, onRegistration, onToLogin}) {
 
-    handleNameInput = event => this.setState({name: event.target.value})
+    const [name, setName] = useState(null)
+    const [surname, setSurname] = useState(null)
+    const [email, setEmail] = useState(null)
+    const [password, setPassword] = useState(null)
+    const [passwordConfirmation, setPasswordConfirmation] = useState(null)
 
-    handleSurnameInput = event => this.setState({surname: event.target.value})
-
-    handleEmailInput = event => this.setState({email: event.target.value})
-
-    handlePasswordInput = event => this.setState({password: event.target.value})
-
-    handlePasswordConfirmationInput = event => this.setState({passwordConfirmation: event.target.value})
-
-    handleOnRegistration = event => {
+    const handleOnRegistration = event => {
         event.preventDefault()
-
-        const { state: { name, surname, email, password, passwordConfirmation}, props: {onRegistration} } = this
 
         onRegistration(name, surname, email, password, passwordConfirmation)
     }
 
-    handleOnLogin = () => {
-        const { props: {onToLogin} } = this
+    const handleCloseModal = () => {
 
         onToLogin()
     }
 
-    render() {
-         const { handleOnLogin, handleOnRegistration, handleNameInput, handleSurnameInput, handleEmailInput, handlePasswordInput, handlePasswordConfirmationInput, props: {feedback}  } = this
-    
-        return <section className="register container margin-top">
+    return (
+    <section className="register container margin-top">
         <div className="columns is-mobile is-centered">
             <form onSubmit={handleOnRegistration} className="register__form column is-half-widescreen is-half-tablet is-three-quarters-mobile is-centered">
                 <h4 className="subtitle is-4">Register</h4>
                 <div className="field">
                     <p className="control has-icons-left has-icons-right">
-                        <input className="input is-small is-rounded" type="text" name="name" placeholder="Name" required onChange={handleNameInput} />
+                        <input className="input is-small is-rounded" type="text" name="name" placeholder="Name" required onChange={e => setName(e.target.value)} />
                         <span className="icon is-small is-left">
                             <i className="far fa-user"></i>
                         </span>
@@ -47,19 +39,19 @@ class Register extends React.Component {
                     </p>
                 </div>
                 <div className="field">
-                <p className="control has-icons-left has-icons-right">
-                    <input className="input is-small is-rounded" type="text" name="surname" placeholder="Surame" required onChange={handleSurnameInput} />
-                    <span className="icon is-small is-left">
-                        <i className="far fa-user"></i>
-                    </span>
-                    <span className="icon is-small is-right">
-                        <i className="fas fa-check"></i>
-                    </span>
-                </p>
+                    <p className="control has-icons-left has-icons-right">
+                        <input className="input is-small is-rounded" type="text" name="surname" placeholder="Surame" required onChange={e => setSurname(e.target.value)} />
+                        <span className="icon is-small is-left">
+                            <i className="far fa-user"></i>
+                        </span>
+                        <span className="icon is-small is-right">
+                            <i className="fas fa-check"></i>
+                        </span>
+                    </p>
                 </div>
                 <div className="field">
                     <p className="control has-icons-left has-icons-right">
-                        <input className="input is-small is-rounded" type="email" name="email" placeholder="Email" required onChange={handleEmailInput}/>
+                        <input className="input is-small is-rounded" type="email" name="email" placeholder="Email" required onChange={e => setEmail(e.target.value)} />
                         <span className="icon is-small is-left">
                             <i className="fas fa-envelope"></i>
                         </span>
@@ -70,7 +62,7 @@ class Register extends React.Component {
                 </div>
                 <div className="field">
                     <p className="control has-icons-left">
-                        <input className="input is-small is-rounded" type="password" name="password"placeholder="Password" required onChange={handlePasswordInput} />
+                        <input className="input is-small is-rounded" type="password" name="password" placeholder="Password" required onChange={e => setPassword(e.target.value)} />
                         <span className="icon is-small is-left">
                             <i className="fas fa-lock"></i>
                         </span>
@@ -78,7 +70,7 @@ class Register extends React.Component {
                 </div>
                 <div className="field">
                     <p className="control has-icons-left">
-                        <input className="input is-small is-rounded" type="password" name="password-confirmation"placeholder="Confirm password" required onChange={handlePasswordConfirmationInput}/>
+                        <input className="input is-small is-rounded" type="password" name="password-confirmation" placeholder="Confirm password" required onChange={e => setPasswordConfirmation(e.target.value)}/>
                         <span className="icon is-small is-left">
                             <i className="fas fa-lock"></i>
                         </span>
@@ -87,20 +79,17 @@ class Register extends React.Component {
                 <div className="field is-grouped btn_grp">
                     <p className="control">
                         <button className="button is-success is-small is-rounded" type="submit">
-                        Register
-                        </button>
+                            Register
+                    </button>
                     </p>
                     <p className="control">
-                        <a href="#" onClick={handleOnLogin} className="button is-outlined is-small is-rounded">
-                        Login
-                        </a>
+                        <Link to="/login" className="button is-outlined is-small is-rounded">Login</Link>
                     </p>
                 </div>
             </form>
         </div>
         {feedback && <Feedback message={feedback} />}
+        {modal && <ModalRegistration closeModal={handleCloseModal} />}
     </section>
-    }
+    )
 }
-
-export default Register;

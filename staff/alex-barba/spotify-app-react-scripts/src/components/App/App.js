@@ -1,165 +1,173 @@
-import React, { Component } from 'react';
-import logic from '../../logic';
-import Banner from '../Banner';
-import Login from '../Login';
-import Search from '../Search';
-import Artist from '../Artist';
-import Album from '../Album';
-import Tracks from '../Tracks';
-import Track from '../Track';
-import ModalRegistration from '../ModalRegistration';
-import Favourite from '../Favourite';
-import Register from '../Register';
+import React, { Component } from 'react'
+import { Route, withRouter, Redirect } from 'react-router-dom'
+import logic from '../../logic'
+import Header from '../Header'
+import Login from '../Login'
+import Search from '../Search'
+import Artist from '../Artist'
+import Album from '../Album'
+import Tracks from '../Tracks'
+import Track from '../Track'
+import Favourite from '../Favourite'
+import Register from '../Register'
 
 class App extends Component {
-  
-  state = {loginFeedback: '', registrationFeedback: '', searchFeedback: '', registerVisible: false, loginVisible: true, homeVisible: false, artistVisible: false , albumVisible: false, tracksVisible: false, trackVisible: false, modalVisible: false, favouritesVisible: false,user:'', userEmail:'', userFavourites: [], artists: [] ,albums: [], tracks: [], track: {}, resultFavourite: false}
 
-  handleLogin = (email, password) =>{
-      try {
-          logic.login(email, password, (user) => {
-              this.setState({loginFeedback: '', loginVisible: false, searchVisible: true, user: user.name, userEmail: user.email, userFavourites: user.favourites})
-          })
-      } catch ({message}) {
-          this.setState({ loginFeedback: message })
-      }
-  }
+    state = { loginFeedback: null, registrationFeedback: null, searchFeedback: null, artistId: null, albumId: null, trackId: null, modal: false, favouritesVisible: false, user: null, userEmail: null, query: null, artists: [], albums: [], tracks: [], track: {} }
 
-  handleRegistration = (name, surname, email, password, passwordConfirmation) => {
-      this.setState ({registrationFeedback: ''})
-      try {
-          logic.register(name, surname, email, password, passwordConfirmation, () => {
-              this.setState({modalVisible: true})
-          })
-      } catch ({message}) {
-          this.setState ({registrationFeedback: message})
-      }
-  }
+    handleLogin = (email, password) => {
+        try {
+            logic.login(email, password)
+                .then(() => logic.retrieveUser())
+                .then(user => { this.setState({ user: user.name, userEmail: user.email, }) })
+                .then(() => this.setState({ loginFeedback: '' }))
+                .then(() => this.props.history.push('/home'))
+                .catch(({ message }) => this.setState({ loginFeedback: message }))
+        } catch ({ message }) {
+            this.setState({ loginFeedback: message })
+        }
+    }
 
-  handleSearch = (query, searchFeedback) => {
-      this.setState({searchFeedback})
-      try {
-          logic.searchArtists(query, (error, artists) => {
-              if (error) this.setState({searchFeedback: error})
-              else {
-                  this.setState({searchFeedback:'' ,artistVisible: true, artists})
-              }
-          })
-      } catch ({message}) {
-          this.setState({searchFeedback: message})
-      }
-  }
+    handleRegistration = (name, surname, email, password, passwordConfirmation) => {
+        try {
+            logic.register(name, surname, email, password, passwordConfirmation)
+                .then(id => this.setState({ modal: true }))
+                .catch(({ message }) => this.setState({ registrationFeedback: message }))
+        } catch ({ message }) {
+            this.setState({ registrationFeedback: message })
+        }
+    }
 
-  handleAlbum = (artistId, searchFeedback) => {
-      this.setState({searchFeedback})
-      try {
-          logic.retrieveAlbums(artistId, (error, albums) => {
-              if (error) this.setState({searchFeedback: error})
-              else {
-                  this.setState({artistVisible: false, albumVisible: true, albums})
-              }
-          })
-      } catch (message) {
-          this.setState({searchFeedback: message})
-      }
-  }
+    handleSearch = query => {
+        this.setState({ searchFeedback: '' })
+        try {
+            Promise.all([
+                logic.searchArtists(query),
+                logic.retrieveUser()
+            ])
+                .then(([artists, { favoriteArtists }]) =>{
+                    debugger
+                    this.setState({
+                        artists: artists.map(({ id, name, images, popularity, genres }) => ({ id, name, images, popularity, genres, isFavorite: favoriteArtists.includes(id) }))
+                    })
+                })
+                
+                .then(() => this.setState({ query }, () => this.props.history.push(`/home/search/${query}`)))
+                .catch(({ message }) => this.setState({ searchFeedback: message }))
+        } catch ({ message }) {
+            this.setState({ searchFeedback: message })
+        }
+    }
 
-  handleTracks = (albumId, searchFeedback) => {
-      this.setState({searchFeedback})
-      try {
-          logic.retrieveTracks(albumId, (error, tracks) => {
-              if (error) this.setState({searchFeedback: error})
-              else {
-                  this.setState({albumVisible: false, tracksVisible:true, tracks})
-              }
-          })
-      } catch (message) {
-          this.setState({searchFeedback: message})
-      }
-  }
+    handleToggleFavorite = artistId => {
+        try {
+            logic.toggleFavoriteArtist(artistId)
+                .then(() => {
+                    const { props: { query } } = this
 
-  handleTrack = (trackId, searchFeedback) => {
-      this.setState({searchFeedback})
-      try {
-          logic.retrieveTrack(trackId, (error, track) => {
-              if (error) this.setState({searchFeedback: error})
-              else {
-                  this.setState({tracksVisible: false, favouritesVisible: false, trackVisible: true, searchVisible: true, track})
-              }
-          })
-      } catch (message) {
-          this.setState({searchFeedback: message})
-      }
-  }
+                    return this.handleSearch(query)
+                })
+                .catch(({ message }) => this.setState({ searchFeedback: message }))
+        } catch ({ message }) {
+            this.setState({ searchFeedback: message })
+        }
+    }
 
-  handleToLogout = () => {
-      this.setState({query: '', loginFeedback: '', registrationFeedback: '', searchVisible: false, artistVisible: false, albumVisible: false, tracksVisible: false, trackVisible: false, registerVisible: false, loginVisible: true, favouritesVisible: false})
-  }
+    handleAlbum = (artistId) => {
+        this.setState({ searchFeedback: '' })
+        try {
+            logic.retrieveAlbums(artistId)
+                .then(albums => this.setState({ albums }))
+                .then(() => this.setState({ artistId }, () => this.props.history.push(`/home/artist/${artistId}`)))
+                .catch(({ message }) => this.setState({ searchFeedback: message }))
+        } catch ({ message }) {
+            this.setState({ searchFeedback: message })
+        }
+    }
 
-  handleCloseModal = () => {
-       this.setState({modalVisible: false,registrationFeeback: '',loginVisible: true, registerVisible: false })
-  }
+    handleTracks = (albumId) => {
+        this.setState({ searchFeedback: '' })
+        try {
+            logic.retrieveTracks(albumId)
+                .then(tracks => this.setState({ tracks }))
+                .then(() => this.setState({ albumId }, () => this.props.history.push(`/home/album/${albumId}`)))
+                .catch(({ message }) => this.setState({ searchFeedback: message }))
+        } catch ({ message }) {
+            this.setState({ searchFeedback: message })
+        }
+    }
 
-  handleToArtists = () => {
-      this.setState({albumVisible: false, artistVisible: true, searchVisible: true})
-  }
+    handleTrack = (trackId) => {
+        this.setState({ searchFeedback: '' })
+        try {
+            logic.retrieveTrack(trackId)
+                .then(track => this.setState({ track }))
+                .then(() => this.setState({ trackId }, () => this.props.history.push(`/home/track/${trackId}`)))
+                .catch(({ message }) => this.setState({ searchFeedback: message }))
+        } catch ({ message }) {
+            this.setState({ searchFeedback: message })
+        }
+    }
 
-  handleToAlbums = () => {
-      this.setState({albumVisible: true, tracksVisible: false})
-  }
+    handleToLogout = () => {
+        this.setState({ query: '', loginFeedback: '', registrationFeedback: '', user: '', userEmail: '', userFavourites: '' })
+        this.props.history.push('/home')
+    }
 
-  handleToTracks = () => {
-      this.setState({trackVisible: false, tracksVisible: true, resultFavourite: false})
-  }
+    handleToArtists = () => {
+        const { state: { query } } = this
+        this.props.history.push(`/home/search/${query}`)
+    }
 
-  handleLoginToRegister= () => {
-      this.setState({registerVisible : true, loginVisible : false})
-  }
+    handleToAlbums = () => {
+        const { state: { artistId } } = this
+        this.props.history.push(`/home/artist/${artistId}`)
+    }
 
-  handleRegisterToLogin = () => {
-      this.setState({registerVisible : false, loginVisible : true})
-  }
+    handleToTracks = () => {
+        const { state: { albumId } } = this
+        this.props.history.push(`/home/album/${albumId}`)
+    }
 
-  handleFavourites = (id, name,) => { 
-      const {state:{userEmail}}= this
-      console.log(this.state.userFavourites)
+    handleLoginToRegister = () => {
+        this.props.history.push('/register')
+    }
 
-      var result = logic.retrieveFavourites(id, name, userEmail, (userFavourites) => {
-          
-          this.setState({userFavourites})
-      })
-      
-      this.setState({resultFavourite : result})
+    handleRegisterToLogin = () => {
+        this.setState({ modal: false, registrationFeedback: null })
+        this.props.history.push('/login')
+    }
 
-      console.log(this.state.userFavourites)
-      console.log(this.state.resultFavourite)
-  }
+    handleToSearch = () => {
+        this.setState({ query: null })
+        this.props.history.push('/home')
+    }
 
-  handleToSearch = () => {
-      this.setState({favouritesVisible: false, searchVisible: true})
-  }
+    render() {
+        const { state: { searchFeedback, loginFeedback, registrationFeedback, modal, artists, user, albums, tracks, track }, handleToggleFavorite,handleLogin, handleRegistration, handleLoginToRegister, handleSearch, handleAlbum, handleTracks, handleTrack, handleToLogout, handleToArtists, handleToAlbums, handleToTracks, handleCloseModal, handleFavourites, onFavourites, handleToSearch , handleRegisterToLogin} = this
 
-  onFavourites = () => {
-      this.setState({searchVisible : false, loginVisible : false, registerVisible: false, artistVisible: false, albumVisible: false, tracksVisible: false, trackVisible: false, favouritesVisible: true})
-  }
+        return <main>
+            <Header path="/" render={() => <Header />} />
+            <Route path="/home" render={() => <Search onToSearch={handleSearch} feedback={searchFeedback} user={user} onToLogout={handleToLogout} onToFavourites={onFavourites} />} />
+            <Route path="/login" render={() => logic.isUserLoggedIn ? <Redirect to="/home" /> : <Login onLogin={handleLogin} feedback={loginFeedback} onToRegister={handleLoginToRegister} />} />
+            <Route path="/register" render={() => logic.isUserLoggedIn ? <Redirect to="/home" /> : <Register onRegistration={handleRegistration} feedback={registrationFeedback} onToLogin={handleRegisterToLogin} modal={modal} />} />
+            <Route path="/home/search/:query" render={props => <Artist artists={artists} onArtist={handleAlbum} query={props.match.params.query} onToggleFavorite={handleToggleFavorite}/>} />
+            <Route path="/home/artist/:artistId" render={props => <Album albums={albums} onAlbum={handleTracks} onToArtists={handleToArtists} artistId={props.match.params.artistId} />} />
+            <Route path="/home/album/:albumId" render={props => <Tracks tracks={tracks} onTrack={handleTrack} onToAlbums={handleToAlbums} albumId={props.match.params.albumId} />} />
+            <Route path="/home/track/:trackId" render={props => <Track track={track} onToTracks={handleToTracks} trackId={props.match.params.trackId} />} />
 
-  render() {
-      const { state: { searchFeedback, loginFeedback, registrationFeedback, registerVisible, loginVisible, searchVisible, artistVisible, albumVisible, tracksVisible, trackVisible, modalVisible, favouritesVisible, artists, user, albums, tracks, track, resultFavourite, userFavourites}, handleLogin, handleRegistration, handleLoginToRegister, handleRegisterToLogin, handleSearch, handleAlbum, handleTracks, handleTrack, handleToLogout, handleToArtists, handleToAlbums, handleToTracks, handleCloseModal, handleFavourites, onFavourites, handleToSearch  } = this
+            {/* {loginVisible && <Login onLogin={handleLogin} feedback={loginFeedback} onToRegister={handleLoginToRegister} />}
+            {registerVisible && <Register onRegistration={handleRegistration} feedback={registrationFeedback} onToLogin={handleRegisterToLogin} />}
+            {searchVisible && <Search onToSearch={handleSearch} feedback={searchFeedback} user={user} onToLogout={handleToLogout} onToFavourites={onFavourites} />}
+            {artistVisible && <Artist artists={artists} onArtist={handleAlbum} />}
+            {albumVisible && <Album albums={albums} onAlbum={handleTracks} onToArtists={handleToArtists} />}
+            {tracksVisible && <Tracks tracks={tracks} onTrack={handleTrack} onToAlbums={handleToAlbums} />}
+            {trackVisible && <Track track={track} onToTracks={handleToTracks} onFavourite={handleFavourites} resultFavourite={resultFavourite} userFavourites={userFavourites} />}
+            {modalVisible && <ModalRegistration closeModal={handleCloseModal} />}
+            {favouritesVisible && <Favourite track={track} userFavourites={userFavourites} onToSearch={handleToSearch} onTrack={handleTrack} />} */}
+        </main>
 
-      return <main>
-      <Banner />
-      {loginVisible && <Login onLogin={handleLogin} feedback={loginFeedback} onToRegister={handleLoginToRegister}/>}
-      {registerVisible && <Register onRegistration={handleRegistration} feedback={registrationFeedback} onToLogin={handleRegisterToLogin}/>}
-      {searchVisible && <Search onToSearch={handleSearch} feedback={searchFeedback} user={user} onToLogout={handleToLogout} onToFavourites={onFavourites}/>}
-      {artistVisible && <Artist artists={artists} onArtist={handleAlbum} />}
-      {albumVisible && <Album albums={albums} onAlbum={handleTracks} onToArtists={handleToArtists}/>}
-      {tracksVisible && <Tracks tracks={tracks} onTrack={handleTrack} onToAlbums={handleToAlbums} />}
-      {trackVisible && <Track track={track} onToTracks={handleToTracks} onFavourite={handleFavourites} resultFavourite={resultFavourite} userFavourites={userFavourites}/>}
-      {modalVisible && <ModalRegistration closeModal={handleCloseModal} />}
-      {favouritesVisible && <Favourite track={track} userFavourites={userFavourites} onToSearch={handleToSearch} onTrack={handleTrack}/> }
-  </main>
-      
-  }
+    }
 }
 
-export default App;
+export default withRouter(App)
