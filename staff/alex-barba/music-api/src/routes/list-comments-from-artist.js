@@ -4,7 +4,7 @@ module.exports = (req, res) => {
     const { params: { id } } = req
     debugger
     try {
-        logic.listCommentsFromArtist(id)
+        logic.listCommentsFromArtist(id )
             .then(comments => res.json(comments))
             .catch(({ message }) => {
                 res.status(404).json({

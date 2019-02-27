@@ -217,7 +217,7 @@ const logic = {
         if  (typeof commentId !== 'string') throw TypeError (`${commentId} is not a string`)  
         if (!commentId.trim().length) throw Error('commentId is empty')
 
-        return musicApi.deleteCommentsFromArtist(this.__userId__, this.__userApiToken__, commentId)
+        return musicApi.deleteCommentFromArtist(this.__userId__, this.__userApiToken__, commentId)
     }
 }
 

@@ -7,7 +7,10 @@
  */
 const spotifyApi = {
     token: 'NO-TOKEN',
+    clientId: 'NO-CLIENT-ID',
+    clientSecret: 'NO-CLIENT-SECRET',
     url: 'https://api.spotify.com/v1',
+    url_token: "https://accounts.spotify.com/api/token",
 
     /**
      * Searches artists.
@@ -30,8 +33,16 @@ const spotifyApi = {
         })
             .then(response => response.json())
             .then(response => {
-                if (response.error) throw Error(response.error.message)
-
+                if (response.error) {
+                    if(
+                        response.error.status === 401 &&
+                        response.error.message === "The access token expired"
+                    ){
+                        return this.refreshToken(this.searchArtists(query))
+                    } else {
+                        throw Error(response.error.message)
+                    }
+                }
                 const { artists: { items } } = response
 
                 return items
@@ -58,6 +69,19 @@ const spotifyApi = {
             }
         })
             .then(response => response.json())
+            .then(response => {
+                if (response.error) {
+                  if (
+                    response.error.status === 401 &&
+                    response.error.message === "The access token expired"
+                  ) {
+                    return this.refreshToken(this.retrieveArtist(artistId));
+                  } else {
+                    throw Error(response.error.message);
+                  }
+                }
+                return response;
+              })
     },
 
     /**
@@ -80,7 +104,19 @@ const spotifyApi = {
             }
         })
             .then(response => response.json())
-            .then(({ items }) => items)
+            .then(response => {
+                if (response.error) {
+                  if (
+                    response.error.status === 401 &&
+                    response.error.message === "The access token expired"
+                  ) {
+                    return this.refreshToken(this.retrieveArtist(artistId))
+                  } else {
+                    throw Error(response.error.message)
+                  }
+                }
+                return response.items
+              })
     },
 
     /**
@@ -103,7 +139,19 @@ const spotifyApi = {
             }
         })
             .then(response => response.json())
-            
+            .then(response => {
+                if (response.error) {
+                  if (
+                    response.error.status === 401 &&
+                    response.error.message === "The access token expired"
+                  ) {
+                    return this.refreshToken(this.retrieveAlbum(albumId))
+                  } else {
+                    throw Error(response.error.message)
+                  }
+                }
+                return response
+              }) 
     },
 
     /**
@@ -126,7 +174,19 @@ const spotifyApi = {
             }
         })
             .then(response => response.json())
-            .then(({ items }) => items)
+            .then(response => {
+                if (response.error) {
+                  if (
+                    response.error.status === 401 &&
+                    response.error.message === "The access token expired"
+                  ) {
+                    return this.refreshToken(this.retrieveArtist(artistId))
+                  } else {
+                    throw Error(response.error.message)
+                  }
+                }
+                return response.items
+              })
     },
 
     /**
@@ -149,7 +209,41 @@ const spotifyApi = {
             }
         })
             .then(response => response.json())
-            .then(response => response)
+            .then(response => {
+                if (response.error) {
+                  if (
+                    response.error.status === 401 &&
+                    response.error.message === "The access token expired"
+                  ) {
+                    return this.refreshToken(this.retrieveArtist(artistId))
+                  } else {
+                    throw Error(response.error.message)
+                  }
+                }
+                return response
+              })
+    },
+
+    refreshToken(promise) {
+        const auth = this.clientId + ":" + this.clientSecret
+
+        let buff = new Buffer(auth);
+        let base64auth = buff.toString("base64");
+        const basicAuth = `Basic ${base64auth}`;
+
+        return fetch(`${this.url_token}`, {
+            headers: {
+                Authorization: basicAuth,
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "grant_type=client_credentials",
+            method: "POST"
+        })
+            .then(response => response.json())
+            .then(response => {
+                this.token = response.access_token;
+                return promise;
+            });
     }
 }
 

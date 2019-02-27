@@ -304,7 +304,7 @@
      */
 
     addCommentToArtist(userId, token, artistId, text) {
-        debugger
+
         if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
         if (!userId.trim().length) throw Error('id is empty')
 
@@ -392,7 +392,6 @@
         })
             .then(response => response.json())
             .then(response => {
-                debugger
                 if (response) return response
                 else throw Error(response.error)
             })

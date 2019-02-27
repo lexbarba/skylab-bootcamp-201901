@@ -55,11 +55,18 @@ export default function Album (props) {
         </div>
         })
         }
-        </div>  
+        </div>
         <div className="columns is-mobile">
             <div className="column is-half is-offset-one-quarter">
-                <textarea className="textarea is-small" placeholder="Add your comment!" onChange={e => setComment(e.target.value)}></textarea>
-                <button className="button is-small is-white"  onClick={() => handleComment()}>Send</button>
+                <div class="field">
+                    <label class="label">Add your comment</label>
+                    <div class="control">
+                        <textarea className="textarea is-small" placeholder="Add your comment!" onChange={e => setComment(e.target.value)}></textarea>
+                    </div>
+                </div>
+                <div class="control">
+                    <button className="button is-small is-white"  onClick={() => handleComment()}>Send</button>
+                </div>
             </div>
         </div> 
         <section className="container has-text-centered">
@@ -80,7 +87,7 @@ export default function Album (props) {
                         </article>
                     </div>
                 </div>
-            }) : null
+            }).reverse() : null
         }
     </section>
     )

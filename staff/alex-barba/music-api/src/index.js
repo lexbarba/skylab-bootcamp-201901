@@ -12,9 +12,11 @@ const cors = require('cors')
 
 const { registerUser, authenticateUser, retrieveUser, searchArtists, updateUser, retrieveArtist, retrieveAlbums, addCommentToArtist, listCommentsFromArtist, toggleFavoriteArtist, toggleFavoriteAlbum, toggleFavoriteTrack,retrieveAlbum, retrieveTrack, retrieveTracks ,notFound , deleteCommentFromArtist} = require('./routes')
 
-const { env: { DB_URL, PORT, SPOTIFY_API_TOKEN, SECRET_JSON }, argv: [, , port = PORT || 8080] } = process
+const { env: { DB_URL, PORT, SPOTIFY_API_TOKEN, SECRET_JSON, CLIENT_ID, CLIENT_SECRET }, argv: [, , port = PORT || 8080] } = process
 
 spotifyApi.token = SPOTIFY_API_TOKEN
+spotifyApi.clientId = CLIENT_ID
+spotifyApi.clientSecret = CLIENT_SECRET
 
 MongoClient.connect(DB_URL, { useNewUrlParser: true })
     .then(client => {
@@ -74,6 +76,5 @@ MongoClient.connect(DB_URL, { useNewUrlParser: true })
         app.listen(port, () => console.log(`server running on port ${port}`))
     })
     .catch(({message}) => {
-        debugger
         console.error(message)
     })

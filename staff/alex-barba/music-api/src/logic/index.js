@@ -214,8 +214,6 @@ const logic = {
         if (typeof text !== 'string') throw TypeError(`text should be a string`)  
         if (!text.trim().length) throw Error('text cannot be empty')  
 
-        debugger
-
         const comment = {
             userId,
             artistId,
@@ -245,7 +243,6 @@ const logic = {
         if (typeof commentId !== 'string') throw TypeError(`commentId should be a string`)  
         if (!commentId.trim().length) throw Error('commentId cannot be empty')  
 
-        debugger
         return users.findByUserId(userId)
             .then(() => artistComments.remove(commentId))
     },
@@ -258,8 +255,6 @@ const logic = {
 
         // if (typeof artistId !== 'string') throw TypeError(`artistId should be a string`)  
         // if (!artistId.trim().length) throw Error('artistId cannot be empty')  
-
-        debugger
 
         return artistComments.find({ artistId })
     },

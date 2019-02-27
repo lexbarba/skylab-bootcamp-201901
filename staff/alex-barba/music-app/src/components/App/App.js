@@ -75,13 +75,11 @@ class App extends Component {
     handleAlbum = (artistId) => {
         this.setState({ searchFeedback: '' })
         try {
-            debugger
             logic.retrieveAlbums(artistId)
                 .then(albums => this.setState({ albums }))
                 .then(() => this.setState({ artistId }))
                 .then(() =>  logic.listCommentsFromArtist(artistId))
                 .then(comments => {
-                    debugger
                     this.setState({comments})
                 })
                 .then(() => this.props.history.push(`/home/artist/${artistId}`))
@@ -152,7 +150,6 @@ class App extends Component {
 
     handleOnComment = comment => {
         const { state: { artistId } } = this
-        debugger
 
         try {
             logic.addCommentToArtist(artistId, comment)
@@ -169,7 +166,7 @@ class App extends Component {
     }
 
     handleCommentDelete = id => {
-        debugger
+
         try {
             logic.deleteCommentfromArtist(id)
                 .then(() => {
