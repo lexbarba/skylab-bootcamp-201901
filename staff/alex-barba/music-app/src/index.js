@@ -10,7 +10,7 @@ import logic from './logic/index'
 Object.defineProperties(logic, {
     __userId__: {
         set(id) {
-            sessionStorage.setItem('__userId__', id)
+            id ? sessionStorage.setItem('__userId__', id) : sessionStorage.removeItem('__userId__')
         },
 
         get() {
@@ -20,7 +20,7 @@ Object.defineProperties(logic, {
 
     __userApiToken__: {
         set(token) {
-            sessionStorage.setItem('__userApiToken__', token)
+            token ? sessionStorage.setItem('__userApiToken__', token) : sessionStorage.removeItem('__userApiToken__')
         },
 
         get() {

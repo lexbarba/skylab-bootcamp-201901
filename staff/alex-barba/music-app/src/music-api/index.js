@@ -304,7 +304,7 @@
      */
 
     addCommentToArtist(userId, token, artistId, text) {
-
+        debugger
         if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
         if (!userId.trim().length) throw Error('id is empty')
 
@@ -357,6 +357,42 @@
         })
             .then(response => response.json())
             .then(response => {
+                if (response) return response
+                else throw Error(response.error)
+            })
+    },
+
+    /**
+     * 
+     * Adds comment to Artist.
+     * 
+     * @param {*} id 
+     * @param {*} token 
+     * @param {*} object 
+     */
+
+    deleteCommentFromArtist(userId, token, commentId) {
+
+        if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
+        if (!userId.trim().length) throw Error('id is empty')
+
+        if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
+        if (!token.trim().length) throw Error('token is empty')
+
+        if (typeof commentId !== 'string') throw TypeError(`${commentId} is not a string`)
+        if (!commentId.trim().length) throw Error('commentId is empty')
+
+        return fetch(`http://localhost:8000/api/artist/comment/${commentId}`, { 
+            method: 'POST', 
+            headers: {
+                authorization: `Bearer ${token}`,
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({ userId }),
+        })
+            .then(response => response.json())
+            .then(response => {
+                debugger
                 if (response) return response
                 else throw Error(response.error)
             })

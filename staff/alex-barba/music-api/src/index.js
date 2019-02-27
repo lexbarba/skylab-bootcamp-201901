@@ -10,7 +10,7 @@ const users = require('./data/users')
 const logic = require('./logic')
 const cors = require('cors')
 
-const { registerUser, authenticateUser, retrieveUser, searchArtists, updateUser, retrieveArtist, retrieveAlbums, addCommentToArtist, listCommentsFromArtist, toggleFavoriteArtist, toggleFavoriteAlbum, toggleFavoriteTrack,retrieveAlbum, retrieveTrack, retrieveTracks ,notFound } = require('./routes')
+const { registerUser, authenticateUser, retrieveUser, searchArtists, updateUser, retrieveArtist, retrieveAlbums, addCommentToArtist, listCommentsFromArtist, toggleFavoriteArtist, toggleFavoriteAlbum, toggleFavoriteTrack,retrieveAlbum, retrieveTrack, retrieveTracks ,notFound , deleteCommentFromArtist} = require('./routes')
 
 const { env: { DB_URL, PORT, SPOTIFY_API_TOKEN, SECRET_JSON }, argv: [, , port = PORT || 8080] } = process
 
@@ -46,6 +46,8 @@ MongoClient.connect(DB_URL, { useNewUrlParser: true })
         router.get('/artist/:id', retrieveArtist)
 
         router.post('/artist/:id/comment', jsonBodyParser,addCommentToArtist)
+
+        router.post('/artist/comment/:commentId', jsonBodyParser, deleteCommentFromArtist)
 
         router.get('/artist/:id/comment', listCommentsFromArtist)
 

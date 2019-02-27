@@ -75,7 +75,7 @@ class App extends Component {
     handleAlbum = (artistId) => {
         this.setState({ searchFeedback: '' })
         try {
-            
+            debugger
             logic.retrieveAlbums(artistId)
                 .then(albums => this.setState({ albums }))
                 .then(() => this.setState({ artistId }))
@@ -117,6 +117,7 @@ class App extends Component {
 
     handleToLogout = () => {
         this.setState({ query: '', loginFeedback: '', registrationFeedback: '', user: '', userEmail: '', userFavourites: '' })
+        logic. logOutUser()
         this.props.history.push('/home')
     }
 
@@ -151,6 +152,7 @@ class App extends Component {
 
     handleOnComment = comment => {
         const { state: { artistId } } = this
+        debugger
 
         try {
             logic.addCommentToArtist(artistId, comment)
@@ -166,22 +168,21 @@ class App extends Component {
 
     }
 
-    // handleCommentDelete = id => {
-    //     const { state: { artistId } } = this
+    handleCommentDelete = id => {
+        debugger
+        try {
+            logic.deleteCommentfromArtist(id)
+                .then(() => {
+                    const { state: { artistId } } = this
 
-    //     try {
-    //         logic.addCommentToArtist(artistId, comment)
-    //             .then(() => {
-    //                 const { state: { artistId } } = this
+                    return this.handleAlbum(artistId)
+                })
+                .catch(({ message }) => this.setState({ searchFeedback: message }))
+        } catch ({ message }) {
+            this.setState({ searchFeedback: message })
+        }
 
-    //                 return this.handleAlbum(artistId)
-    //             })
-    //             .catch(({ message }) => this.setState({ searchFeedback: message }))
-    //     } catch ({ message }) {
-    //         this.setState({ searchFeedback: message })
-    //     }
-
-    // }
+    }
 
     render() {
         const { state: { searchFeedback, loginFeedback, registrationFeedback, modal, artists, user, albums, tracks, track, comments, userId }, handleCommentDelete, handleOnComment, handleToggleFavorite, handleLogin, handleRegistration, handleLoginToRegister, handleSearch, handleAlbum, handleTracks, handleTrack, handleToLogout, handleToArtists, handleToAlbums, handleToTracks, handleCloseModal, handleFavourites, onFavourites, handleToSearch, handleRegisterToLogin } = this
@@ -192,7 +193,7 @@ class App extends Component {
             <Route path="/login" render={() => logic.isUserLoggedIn ? <Redirect to="/home" /> : <Login onLogin={handleLogin} feedback={loginFeedback} onToRegister={handleLoginToRegister} />} />
             <Route path="/register" render={() => logic.isUserLoggedIn ? <Redirect to="/home" /> : <Register onCommentDelete={handleCommentDelete}onRegistration={handleRegistration} feedback={registrationFeedback} onToLogin={handleRegisterToLogin} modal={modal} />} />
             <Route path="/home/search/:query" render={props => <Artist artists={artists} onArtist={handleAlbum} query={props.match.params.query} onToggleFavorite={handleToggleFavorite} />} />
-            <Route path="/home/artist/:artistId" render={props => <Album onComment={handleOnComment} userId={userId} comments={comments} albums={albums} onAlbum={handleTracks} onToArtists={handleToArtists} artistId={props.match.params.artistId} />} />
+            <Route path="/home/artist/:artistId" render={props => <Album onCommentDelete={handleCommentDelete} onComment={handleOnComment} userId={userId} comments={comments} albums={albums} onAlbum={handleTracks} onToArtists={handleToArtists} artistId={props.match.params.artistId} />} />
             <Route path="/home/album/:albumId" render={props => <Tracks tracks={tracks} onTrack={handleTrack} onToAlbums={handleToAlbums} albumId={props.match.params.albumId} />} />
             <Route path="/home/track/:trackId" render={props => <Track track={track} onToTracks={handleToTracks} trackId={props.match.params.trackId} />} />
 

@@ -1,122 +1,30 @@
 [
     {
         "userId": "5c757275a374130dfae4a20e",
-        "text": "Hola!",
-        "date": "2019-02-26T18:24:23.099Z",
-        "id": "d7ad5e15-e3e9-40d4-bdcc-6b065e3dbbae"
+        "artistId": "2ye2Wgw4gimLv2eAKyk1NB",
+        "text": "hola!",
+        "date": "2019-02-27T18:18:22.182Z",
+        "id": "31b90053-9c33-4080-8582-ec6feff9ee4c"
     },
     {
         "userId": "5c757275a374130dfae4a20e",
-        "text": "Hola!",
-        "date": "2019-02-26T18:24:37.998Z",
-        "id": "64071e7e-041c-47ea-b564-e4d914177200"
+        "artistId": "2ye2Wgw4gimLv2eAKyk1NB",
+        "text": "metallica",
+        "date": "2019-02-27T18:21:49.144Z",
+        "id": "83ea0900-d125-403d-b66a-16ff72b6c666"
     },
     {
         "userId": "5c757275a374130dfae4a20e",
-        "text": "Test 3!",
-        "date": "2019-02-26T18:29:21.164Z",
-        "id": "656c22cd-d1ed-4af7-b2fe-229925292838"
+        "artistId": "2ye2Wgw4gimLv2eAKyk1NB",
+        "text": "metallica",
+        "date": "2019-02-27T18:22:42.406Z",
+        "id": "ee6c586e-58a7-42da-ae76-7cab4d311557"
     },
     {
         "userId": "5c757275a374130dfae4a20e",
-        "text": "xungo!",
-        "date": "2019-02-26T18:48:00.156Z",
-        "id": "adf555a6-6c4a-4476-aae1-00f352e303ff"
-    },
-    {
-        "userId": "5c757275a374130dfae4a20e",
-        "text": "marit mamon! saluda al cak",
-        "date": "2019-02-26T18:48:10.910Z",
-        "id": "391c4c41-bb31-4553-9caa-7f818da0030e"
-    },
-    {
-        "userId": "5c757275a374130dfae4a20e",
-        "text": "marit mamon! saluda al cak",
-        "date": "2019-02-26T18:48:27.490Z",
-        "id": "bea1be42-e4fb-4970-a71e-6a0babe113aa"
-    },
-    {
-        "userId": "5c757275a374130dfae4a20e",
-        "text": "marit mamon! saluda al cak",
-        "date": "2019-02-26T18:48:29.456Z",
-        "id": "bf35c0eb-9168-46ec-ba2c-e097489938a7"
-    },
-    {
-        "userId": "5c757275a374130dfae4a20e",
-        "text": "marit mamon! saluda al cak",
-        "date": "2019-02-26T18:48:30.695Z",
-        "id": "fa1b185e-d318-4cdf-86a0-f11854e3eb2f"
-    },
-    {
-        "userId": "5c757275a374130dfae4a20e",
-        "text": "marit mamon! saluda al cak",
-        "date": "2019-02-26T18:48:32.038Z",
-        "id": "79d0d172-84f9-4f50-a541-98c8a4d563c0"
-    },
-    {
-        "userId": "5c757275a374130dfae4a20e",
-        "text": "marit mamon! saluda al cak",
-        "date": "2019-02-26T18:48:33.050Z",
-        "id": "0105e2dc-f901-44e1-a1a1-70ab1438dddd"
-    },
-    {
-        "userId": "5c757275a374130dfae4a20e",
-        "text": "marit mamon! saluda al cak",
-        "date": "2019-02-26T18:48:34.254Z",
-        "id": "a0a09a46-2557-436e-b953-ed9dad3024e6"
-    },
-    {
-        "userId": "5c757275a374130dfae4a20e",
-        "text": "marit mamon! saluda al cak",
-        "date": "2019-02-26T18:48:35.040Z",
-        "id": "3f41c104-8f1a-4467-bea0-9ebbfc457aee"
-    },
-    {
-        "userId": "5c757275a374130dfae4a20e",
-        "text": "marit mamon! saluda al cak",
-        "date": "2019-02-26T18:48:37.264Z",
-        "id": "aa6b3ca2-7b26-4a0e-9425-f3dbeeff2058"
-    },
-    {
-        "userId": "5c757275a374130dfae4a20e",
-        "text": "marit mamon! saluda al cak",
-        "date": "2019-02-26T18:48:37.647Z",
-        "id": "3d0a7da0-1cac-4b9e-b22e-018535c48bc2"
-    },
-    {
-        "userId": "5c757275a374130dfae4a20e",
-        "text": "marit mamon! saluda al cak",
-        "date": "2019-02-26T18:48:39.967Z",
-        "id": "09229ea0-6544-47e6-b8fe-a5f3ed721db7"
-    },
-    {
-        "userId": "5c757275a374130dfae4a20e",
-        "text": "emmma!!!!!",
-        "date": "2019-02-27T08:05:43.224Z",
-        "id": "abfd1e49-a665-4b67-a53c-849def0bf5a3"
-    },
-    {
-        "userId": "5c757275a374130dfae4a20e",
-        "text": "kljahslkjdhaljkfbiñauhckjawbvjhkeaghkjsadnfkljshad,fnaskjldfhkjsadnfolsahfdlkashdlkfkhsadf",
-        "date": "2019-02-27T08:06:07.100Z",
-        "id": "bf3572de-c504-4562-b563-44187e1286d1"
-    },
-    {
-        "userId": "5c757275a374130dfae4a20e",
-        "text": "el martí em cal malament",
-        "date": "2019-02-27T08:33:54.140Z",
-        "id": "73aabc82-dbca-424d-9f1d-709ade8310c0"
-    },
-    {
-        "userId": "5c764d9ad569b603349ff368",
-        "text": "hola serena",
-        "date": "2019-02-27T08:43:37.616Z",
-        "id": "2abee41e-a42b-4662-99a2-d07b31cc108a"
-    },
-    {
-        "userId": "5c757275a374130dfae4a20e",
-        "text": "adsasdas",
-        "date": "2019-02-27T09:13:54.036Z",
-        "id": "f938dab0-6ab7-467c-82d9-1a0ff9081128"
+        "artistId": "2ye2Wgw4gimLv2eAKyk1NB",
+        "text": "asdasdasd",
+        "date": "2019-02-27T18:25:02.745Z",
+        "id": "5f852700-9b3d-4ed3-abd7-6445932edf40"
     }
 ]

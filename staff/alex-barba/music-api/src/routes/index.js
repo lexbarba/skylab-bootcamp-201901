@@ -14,6 +14,8 @@ module.exports = {
 
     addCommentToArtist: require('./add-comment-to-artist'),
 
+    deleteCommentFromArtist: require('./delete-comment-from-artist'),
+
     listCommentsFromArtist: require('./list-comments-from-artist'),
 
     toggleFavoriteArtist: require('./toggle-favorite-artist'),

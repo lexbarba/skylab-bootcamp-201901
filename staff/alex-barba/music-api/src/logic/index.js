@@ -98,7 +98,7 @@ const logic = {
             delete user.password
 
             return user
-        })
+        })()
     },
     /**
      * 
@@ -192,21 +192,7 @@ const logic = {
 
             user.favoriteArtists = favoriteArtists
             return users.update(user)
-        })
-        // return users.findByUserId(userId)
-        //     .then(user => {
-        //         debugger
-        //         const { favoriteArtists = [] } = user
-
-        //         const index = favoriteArtists.findIndex(_artistId => _artistId === artistId)
-
-        //         if (index < 0) favoriteArtists.push(artistId)
-        //         else favoriteArtists.splice(index, 1)
-
-        //         user.favoriteArtists = favoriteArtists
-        //         debugger
-        //         return users.update(user)
-        //     })
+        })()
     },
 
     /**
@@ -228,6 +214,8 @@ const logic = {
         if (typeof text !== 'string') throw TypeError(`text should be a string`)  
         if (!text.trim().length) throw Error('text cannot be empty')  
 
+        debugger
+
         const comment = {
             userId,
             artistId,
@@ -242,12 +230,36 @@ const logic = {
 
     /**
      * 
+     * @param {*} userId 
+     * @param {*} token 
+     * @param {*} artistId 
+     * @param {*} text 
+     */
+    deleteCommentFromArtist(commentId, token, userId) {
+        
+        if (typeof userId !== 'string') throw TypeError(`userId should be a string`)  
+        if (!userId.trim().length) throw Error('userId cannot be empty')  
+        if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
+        if (!token.trim().length) throw Error('token cannot be empty')
+        if (jwt.verify(token, SECRET_JSON).data !== userId) throw Error('Incorrect token')
+        if (typeof commentId !== 'string') throw TypeError(`commentId should be a string`)  
+        if (!commentId.trim().length) throw Error('commentId cannot be empty')  
+
+        debugger
+        return users.findByUserId(userId)
+            .then(() => artistComments.remove(commentId))
+    },
+
+    /**
+     * 
      * @param {*} artistId 
      */
     listCommentsFromArtist(artistId) {
 
-        if (typeof userId !== 'string') throw TypeError(`userId should be a string`)  
-        if (!userId.trim().length) throw Error('userId cannot be empty')  
+        // if (typeof artistId !== 'string') throw TypeError(`artistId should be a string`)  
+        // if (!artistId.trim().length) throw Error('artistId cannot be empty')  
+
+        debugger
 
         return artistComments.find({ artistId })
     },
@@ -305,7 +317,7 @@ const logic = {
             user.favoriteAlbums = favoriteAlbums
 
             return users.update(user)
-        })
+        })()
     },
 
     /**
@@ -358,7 +370,7 @@ const logic = {
             user.favoriteTracks = favoriteTracks
 
             return users.update(user)
-        })
+        })()
     }
 }
 

@@ -204,15 +204,20 @@ const logic = {
         if (!text.trim().length) throw Error('text is empty')
 
         return musicApi.addCommentToArtist(this.__userId__, this.__userApiToken__, artistId, text)
-
-
     },
 
     listCommentsFromArtist(artistId){
         if  (typeof artistId !== 'string') throw TypeError (`${artistId} is not a string`)  
         if (!artistId.trim().length) throw Error('artistId is empty')
 
-        return musicApi.listCommentsFromArtist(this.__userId__, this.__userApiToken__, artistId)
+        return musicApi.listCommentsFromArtist(this.__userApiToken__, artistId)
+    },
+
+    deleteCommentfromArtist(commentId){
+        if  (typeof commentId !== 'string') throw TypeError (`${commentId} is not a string`)  
+        if (!commentId.trim().length) throw Error('commentId is empty')
+
+        return musicApi.deleteCommentsFromArtist(this.__userId__, this.__userApiToken__, commentId)
     }
 }
 

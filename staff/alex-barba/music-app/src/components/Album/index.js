@@ -69,12 +69,12 @@ export default function Album (props) {
             props.comments.map(comments => {
                 return  <div className="comments columns margin-top">
                     <div className="column">
-                        <article class="message">
-                            <div class="message-header">
+                        <article className="message" data-id={comments.id}>
+                            <div className="message-header">
                                 User: {comments.userId}
-                                { comments.userId === props.userId ? <button class="delete" onClick={() => handleDelete(comment.id)}></button> : null}
+                                { comments.userId === props.userId ? <button className="delete" onClick={() => handleDelete(comments.id)}></button> : null}
                             </div>
-                            <div class="message-body">
+                            <div className="message-body">
                                 {comments.text}
                             </div>
                         </article>
