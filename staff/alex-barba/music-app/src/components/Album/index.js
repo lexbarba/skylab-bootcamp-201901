@@ -21,6 +21,12 @@ export default function Album (props) {
 
         onToArtists()
     }
+
+    const handleDelete = (id) => {
+        const { onCommentDelete} = props
+
+        onCommentDelete(id)
+    }
     return (
     <section className="resultsAlbum container margin-top">
         <div className="level is-mobile">
@@ -30,7 +36,6 @@ export default function Album (props) {
             </div>
         </div>
         <div className="albums columns is-mobile is-multiline is-centered">
-
         {
         props.albums.map(({ id, name, images, release_date, total_tracks }) =>{
             const image = images[0] ? images[0].url :  'https://developer.spotify.com/assets/branding-guidelines/icon3@2x.png'
@@ -50,27 +55,33 @@ export default function Album (props) {
         </div>
         })
         }
-        <div className="comments columns is-mobile is-centered">
+        </div>  
+        <div className="columns is-mobile">
+            <div className="column is-half is-offset-one-quarter">
+                <textarea className="textarea is-small" placeholder="Add your comment!" onChange={e => setComment(e.target.value)}></textarea>
+                <button className="button is-small is-white"  onClick={() => handleComment()}>Send</button>
+            </div>
+        </div> 
+        <section className="container has-text-centered">
+            <h5 className="title is-5 margin-top">Comments</h5>
+        </section>
         {   props.comments ?
             props.comments.map(comments => {
-                return <div className="column cursor card is-three-quarters-mobile has-text-centered">
-                    <div className="card-content is-centered">
-                        <p className="title is-4">{comments.text}</p>
-                        <p className="subtitle is-6">User: {comments.userId}</p>
+                return  <div className="comments columns margin-top">
+                    <div className="column">
+                        <article class="message">
+                            <div class="message-header">
+                                User: {comments.userId}
+                                { comments.userId === props.userId ? <button class="delete" onClick={() => handleDelete(comment.id)}></button> : null}
+                            </div>
+                            <div class="message-body">
+                                {comments.text}
+                            </div>
+                        </article>
                     </div>
                 </div>
             }) : null
         }
-        </div>
-        <div className="comments columns is-mobile is-centered">
-            <div className="column cursor card is-three-quarters-mobile has-text-centered">
-                <div className="card-content is-centered">
-                    <textarea className="title is-4" placeholder="Add your comment!" onChange={e => setComment(e.target.value)}></textarea>
-                    <button className="button is-large is-white"  onClick={() => handleComment()}>Send</button>
-                </div>
-            </div>
-        </div>
-        </div>     
     </section>
     )
 }

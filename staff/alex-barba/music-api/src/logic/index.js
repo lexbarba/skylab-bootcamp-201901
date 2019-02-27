@@ -24,6 +24,7 @@ const logic = {
     * @param {string} passwordConfirmation 
     */
     registerUser(name, surname, email, password, passwordConfirmation) {
+
         if (typeof name !== 'string') throw TypeError(name + ' is not a string')
         if (!name.trim().length) throw Error('name cannot be empty')
         if (typeof surname !== 'string') throw TypeError(surname + ' is not a string')
@@ -36,13 +37,16 @@ const logic = {
         if (!passwordConfirmation.trim().length) throw Error('password confirmation cannot be empty')
         if (password !== passwordConfirmation) throw Error('passwords do not match')
 
-        return users.findByEmail(email)
-            .then(user => {
-                if (user) throw Error(`user with email ${email} already exists`)
 
-                return bcrypt.hash(password, 10)
-            })
-            .then(hash => users.add({ name, surname, email, password: hash }))
+        return (async()=> {
+            const user = await users.findByEmail(email)
+
+            if (user) throw Error(`user with email ${email} already exists`)
+
+            const hash = await bcrypt.hash(password, 10)
+
+            return await users.add({ name, surname, email, password: hash })
+        })()
     },
 
     /**
@@ -52,24 +56,25 @@ const logic = {
      * @param {string} password 
      */
     authenticateUser(email, password) {
+
         if (typeof email !== 'string') throw TypeError(email + ' is not a string')
         if (!email.trim().length) throw Error('email cannot be empty')
         if (typeof password !== 'string') throw TypeError(password + ' is not a string')
         if (!password.trim().length) throw Error('password cannot be empty')
 
-        return users.findByEmail(email)
-            .then(user => {
-                if (!user) throw Error(`user with email ${email} not found`)
-                return bcrypt.compare(password, user.password)
-                    .then(match => {
-                        if (!match) throw Error('wrong credentials')
-                        
-                        const {id} = user
-                        const secret = SECRET_JSON
-                        const token = jwt.sign({data: id}, secret, { expiresIn: '48h' })
-                        return { id, token }
-                    })
-            })
+        return (async() => {
+
+            const user= await users.findByEmail(email)
+            if (!user) throw Error(`user with email ${email} not found`)
+
+            const match= await bcrypt.compare(password, user.password)
+            if (!match) throw Error('wrong credentials')
+            const {id} = user
+            const secret = SECRET_JSON
+            const token = await jwt.sign({data: id}, secret, { expiresIn: '48h' })
+
+            return { id, token }
+        })()
     },
     
     /**
@@ -86,14 +91,14 @@ const logic = {
 
         if (jwt.verify(token, SECRET_JSON).data !== userId) throw Error('Incorrect token')
 
-        return users.findByUserId(userId)
-            .then(user => {
-                if (!user) throw Error(`user with id ${id} not found`)
+        return (async() => {
+            const user = await users.findByUserId(userId)
+            if (!user) throw Error(`user with id ${id} not found`)
+            
+            delete user.password
 
-                delete user.password
-
-                return user
-            })
+            return user
+        })
     },
     /**
      * 
@@ -104,17 +109,11 @@ const logic = {
     updateUser(userId, token, data) {
 
         if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
-
-        if (!token.trim().length) throw Error('token cannot be empty')
-        
+        if (!token.trim().length) throw Error('token cannot be empty')    
         if (jwt.verify(token, SECRET_JSON).data !== userId) throw Error('Incorrect token')
-
         if (typeof userId !== 'string') throw TypeError(userId + ' is not a string')
-
         if (!userId.trim().length) throw Error('userId cannot be empty')
-
         if (!data) throw Error('data should be defined')
-
         if (data.constructor !== Object) throw TypeError(`${data} is not an object`)
 
         return users.update(userId, data)
@@ -159,14 +158,12 @@ const logic = {
         if (typeof artistId !== 'string') throw TypeError(`${artistId} is not a string`)
         if (!artistId.trim().length) throw Error('artistId is empty')
 
-        return spotifyApi.retrieveArtist(artistId)
-            .then(artist => {
-                return artistComments.find({ artistId: artist.id })
-                    .then(comments => {
-                        artist.comments = comments
-                    })
-                    .then(() => artist)
-            })
+        return (async() => {
+            const artist = await spotifyApi.retrieveArtist(artistId)
+            const comments = await artistComments.find({ artistId: artist.id })
+            artist.comments = comments
+            return artist
+        })
     },
 
     /**
@@ -176,31 +173,40 @@ const logic = {
      */
     toggleFavoriteArtist(userId, token, artistId) {
 
-        //todo
-        if (typeof userId !== 'string') throw TypeError(`userId should be a string`)
-        
-        if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
-        
+        if (typeof userId !== 'string') throw TypeError(`userId should be a string`)  
+        if (!userId.trim().length) throw Error('userId cannot be empty')  
+        if (typeof token !== 'string') throw TypeError(`${token} is not a string`) 
         if (!token.trim().length) throw Error('token cannot be empty')
-        
         if (jwt.verify(token, SECRET_JSON).data !== userId) throw Error('Incorrect token')
+        if (typeof artistId !== 'string') throw TypeError(`artistId should be a string`)
+        if (!artistId.trim().length) throw Error('artistId cannot be empty')  
+        
 
-        // if (typeof artistId !== 'string') throw TypeError(`artistId should be a string`)
+        return(async() => {
+            const user = await users.findByUserId(userId)
+            const { favoriteArtists = [] } = user
+            const index = favoriteArtists.findIndex(_artistId => _artistId === artistId)
 
-        return users.findByUserId(userId)
-            .then(user => {
-                debugger
-                const { favoriteArtists = [] } = user
+            if (index < 0) favoriteArtists.push(artistId)
+            else favoriteArtists.splice(index, 1)
 
-                const index = favoriteArtists.findIndex(_artistId => _artistId === artistId)
+            user.favoriteArtists = favoriteArtists
+            return users.update(user)
+        })
+        // return users.findByUserId(userId)
+        //     .then(user => {
+        //         debugger
+        //         const { favoriteArtists = [] } = user
 
-                if (index < 0) favoriteArtists.push(artistId)
-                else favoriteArtists.splice(index, 1)
+        //         const index = favoriteArtists.findIndex(_artistId => _artistId === artistId)
 
-                user.favoriteArtists = favoriteArtists
-                debugger
-                return users.update(user)
-            })
+        //         if (index < 0) favoriteArtists.push(artistId)
+        //         else favoriteArtists.splice(index, 1)
+
+        //         user.favoriteArtists = favoriteArtists
+        //         debugger
+        //         return users.update(user)
+        //     })
     },
 
     /**
@@ -211,11 +217,16 @@ const logic = {
      * @param {*} text 
      */
     addCommentToArtist(userId, token, artistId, text) {
+        
+        if (typeof userId !== 'string') throw TypeError(`userId should be a string`)  
+        if (!userId.trim().length) throw Error('userId cannot be empty')  
         if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
-        
         if (!token.trim().length) throw Error('token cannot be empty')
-        
         if (jwt.verify(token, SECRET_JSON).data !== userId) throw Error('Incorrect token')
+        if (typeof artistId !== 'string') throw TypeError(`artistId should be a string`)  
+        if (!artistId.trim().length) throw Error('artistId cannot be empty')  
+        if (typeof text !== 'string') throw TypeError(`text should be a string`)  
+        if (!text.trim().length) throw Error('text cannot be empty')  
 
         const comment = {
             userId,
@@ -223,7 +234,7 @@ const logic = {
             text,
             date: new Date
         }
-
+        //???
         return users.findByUserId(userId)
             .then(() => artistComments.add(comment))
             .then(() => comment.id)
@@ -234,7 +245,9 @@ const logic = {
      * @param {*} artistId 
      */
     listCommentsFromArtist(artistId) {
-        // TODO artistId
+
+        if (typeof userId !== 'string') throw TypeError(`userId should be a string`)  
+        if (!userId.trim().length) throw Error('userId cannot be empty')  
 
         return artistComments.find({ artistId })
     },
@@ -247,7 +260,6 @@ const logic = {
     retrieveAlbums(artistId) {
 
         if (typeof artistId !== 'string') throw TypeError(`${artistId} is not a string`)
-
         if (!artistId.trim().length) throw Error('artistId is empty')
 
         return spotifyApi.retrieveAlbums(artistId)
@@ -259,8 +271,8 @@ const logic = {
      * @param {string} albumId 
      */
     retrieveAlbum(albumId) {
-        if (typeof albumId !== 'string') throw TypeError(`${albumId} is not a string`)
 
+        if (typeof albumId !== 'string') throw TypeError(`${albumId} is not a string`)
         if (!albumId.trim().length) throw Error('albumId is empty')
 
         return spotifyApi.retrieveAlbum(albumId)
@@ -275,28 +287,25 @@ const logic = {
 
         //todo
         if (typeof userId !== 'string') throw TypeError(`userId should be a string`)
-        
-        if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
-        
-        if (!token.trim().length) throw Error('token cannot be empty')
-        
+        if (!userId.trim().length) throw Error('userId is empty')
+        if (typeof token !== 'string') throw TypeError(`${token} is not a string`)    
+        if (!token.trim().length) throw Error('token cannot be empty') 
         if (jwt.verify(token, SECRET_JSON).data !== userId) throw Error('Incorrect token')
-
         if (typeof albumId !== 'string') throw TypeError(`albumId should be a string`)
+        if (!albumId.trim().length) throw Error('albumId is empty')
 
-        return users.findByUserId(userId)
-            .then(user => {
-                const { favoriteAlbums = [] } = user
+        return(async() => {
+            const user = await users.findByUserId(userId)
+            const { favoriteAlbums = [] } = user
+            const index = favoriteAlbums.findIndex(_albumId => _albumId === albumId)
 
-                const index = favoriteAlbums.findIndex(_albumId => _albumId === albumId)
+            if (index < 0) favoriteAlbums.push(albumId)
+            else favoriteAlbums.splice(index, 1)
 
-                if (index < 0) favoriteAlbums.push(albumId)
-                else favoriteAlbums.splice(index, 1)
+            user.favoriteAlbums = favoriteAlbums
 
-                user.favoriteAlbums = favoriteAlbums
-
-                return users.update(user)
-            })
+            return users.update(user)
+        })
     },
 
     /**
@@ -306,7 +315,6 @@ const logic = {
      */
     retrieveTracks(albumId) {
         if (typeof albumId !== 'string') throw TypeError(`${albumId} is not a string`)
-
         if (!albumId.trim().length) throw Error('albumId is empty')
 
         return spotifyApi.retrieveTracks(albumId)
@@ -319,7 +327,6 @@ const logic = {
      */
     retrieveTrack(trackId) {
         if (typeof trackId !== 'string') throw TypeError(`${trackId} is not a string`)
-
         if (!trackId.trim().length) throw Error('trackId is empty')
 
         return spotifyApi.retrieveTrack(trackId)
@@ -332,30 +339,26 @@ const logic = {
      */
     toggleFavoriteTrack(userId, token, trackId) {
 
-        //todo
         if (typeof userId !== 'string') throw TypeError(`userId should be a string`)
-        
+        if (!userId.trim().length) throw Error('userId is empty')
         if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
-        
         if (!token.trim().length) throw Error('token cannot be empty')
-        
         if (jwt.verify(token, SECRET_JSON).data !== userId) throw Error('Incorrect token')
-
         if (typeof trackId !== 'string') throw TypeError(`trackId should be a string`)
+        if (!trackId.trim().length) throw Error('trackId is empty')
 
-        return users.findByUserId(userId)
-            .then(user => {
-                const { favoriteTracks = [] } = user
+        return (async() => {
+            const user = await users.findByUserId(userId)
+            const { favoriteTracks = [] } = user
+            const index = favoriteTracks.findIndex(_trackId => _trackId === trackId)
 
-                const index = favoriteTracks.findIndex(_trackId => _trackId === trackId)
+            if (index < 0) favoriteTracks.push(trackId)
+            else favoriteTracks.splice(index, 1)
 
-                if (index < 0) favoriteTracks.push(trackId)
-                else favoriteTracks.splice(index, 1)
+            user.favoriteTracks = favoriteTracks
 
-                user.favoriteTracks = favoriteTracks
-
-                return users.update(user)
-            })
+            return users.update(user)
+        })
     }
 }
 
