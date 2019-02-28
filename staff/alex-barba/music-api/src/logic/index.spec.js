@@ -1,51 +1,57 @@
 require('dotenv').config()
 require('isomorphic-fetch')
 
-const { MongoClient, ObjectId } = require('mongodb')
+const mongoose = require('mongoose')
+const { User, Comment } = require('../models')
 const expect = require('expect')
 const spotifyApi = require('../spotify-api')
 const artistComments = require('../data/artist-comments')
 const logic = require('.')
 const users = require('../data/users')
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt') 
 
-const { env: { DB_URL, SPOTIFY_API_TOKEN, SECRET_JSON } } = process
+const { DB_URL, SPOTIFY_API_TOKEN, SECRET_JSON, CLIENT_ID, CLIENT_SECRET } = process.env
 
 spotifyApi.token = SPOTIFY_API_TOKEN
+spotifyApi.clientId = CLIENT_ID
+spotifyApi.clientSecret= CLIENT_SECRET
+
 
 describe('logic', () => {
-    let client
-
-    before(() =>
-        MongoClient.connect(DB_URL, { useNewUrlParser: true })
-            .then(_client => {
-                client = _client
-
-                users.collection = client.db().collection('users')
-            })
-    )
+    
+    before(() => mongoose.connect(DB_URL, { useNewUrlParser: true }))
 
     beforeEach(() =>
         Promise.all([
-            artistComments.removeAll(),
-            users.collection.deleteMany()
+            Comment.deleteMany(),
+            User.deleteMany()
         ])
     )
 
     describe('register user', () => {
         const name = 'Manuel'
         const surname = 'Barzi'
-        const email = `manuelbarzi@mail.com-${Math.random()}`
+        const email = `manuelbarzi-${Math.random()}@mail.com`
         const password = '123'
         const passwordConfirm = password
 
-        it('should succeed on valid data', () =>
-            logic.registerUser(name, surname, email, password, passwordConfirm)
-                .then(id => {
-                    expect(id).toBeDefined()
-                    expect(typeof id).toBe('string')
-                })
-        )
+        it('should succeed on valid data', async() =>{
+            const id = await logic.registerUser(name, surname, email, password, passwordConfirm)
+            
+            expect(id).toBeDefined()
+            expect(typeof id).toBe('object')
+
+            const user = await User.findOne({ email })
+
+            expect(user.name).toBe(name)
+            expect(user.surname).toBe(surname)
+            expect(user.email).toBe(email)
+
+            const match = await bcrypt.compare(password, user.password)
+
+            expect(match).toBeTruthy()
+        })
 
         it('should fail on undefined name', () => {
             const name = undefined
@@ -468,10 +474,11 @@ describe('logic', () => {
         let email
         let password
         
-        beforeEach(() => {
+        beforeEach(async() => {
             password = '123'
-            email = `manuelbarzi@mail.com-${Math.random()}`
-            return users.add({name, surname, email, password})
+            email = `manuelbarzi${Math.random()}@mail.com`
+            const hash = await bcrypt.hash(password, 10)
+            return User.create({name, surname, email, password: hash})
         })
 
         it('should succeed on correct credentials', () =>
@@ -592,20 +599,16 @@ describe('logic', () => {
         let password
         let _id, _token
 
-        beforeEach(() => {
-            email = `manuelbarzi@mail.com-${Math.random()}`
+        beforeEach(async() => {
+            email = `manuelbarzi-${Math.random()}@mail.com`
             password = '123'
-            return users.add({name, surname, email, password})
-                .then(() => users.findByEmail(email))
-                .then(user => {
-                    _id = user.id
-                    _token = jwt.sign({
-                        data: _id
-                    }, SECRET_JSON, { expiresIn: '48h' })
-                })
-                .catch((err) => {
-                    if (err) throw err
-                })
+            const hash = await bcrypt.hash(password, 10)
+            await User.create({name, surname, email, password: hash})
+            const user = await User.findOne({email})
+                _id = user.id
+                _token = jwt.sign({
+                    data: _id
+                }, SECRET_JSON, { expiresIn: '48h' })
             })
 
         it('should succeed on correct credentials', () =>
@@ -626,26 +629,22 @@ describe('logic', () => {
         let password
         let _id, _token
 
-        beforeEach(() => {
-            email = `manuelbarzi@mail.com-${Math.random()}`
+        beforeEach(async() => {
+            email = `manuelbarzi-${Math.random()}@mail.com`
             password = '123'
-            return users.add({name, surname, email, password})
-                .then(() => users.findByEmail(email))
-                .then((user) => {
-                    _id = user.id
-                    _token = jwt.sign({
-                        data: _id
-                    }, SECRET_JSON, { expiresIn: '48h' })
-                })
-                .catch((err) => {
-                    if (err) throw err
-                })
+            const hash = await bcrypt.hash(password, 10)
+            await User.create({name, surname, email, password: hash})
+            const user = await User.findOne({email})
+                _id = user.id
+                _token = jwt.sign({
+                    data: _id
+                }, SECRET_JSON, { expiresIn: '48h' })
             })
 
         it('should succeed on correct credentials', () => {
             let data = {name: 'Manuel2'}
             return logic.updateUser(_id, _token, data)
-                .then(() => users.findByUserId(_id))
+                .then(() => User.findById(_id))
                 .then(user => {
                     expect(user.id).toEqual(_id)
                     expect(user.name).toBe(data.name)
@@ -653,7 +652,7 @@ describe('logic', () => {
                     expect(user.email).toBe(email)
                 })
             })
-        // TODO more unit test cases
+
     })
 
     describe('remove user', () => {
@@ -663,34 +662,27 @@ describe('logic', () => {
         let password
         let _id, _token
 
-        beforeEach(() => {
-            email = `manuelbarzi@mail.com-${Math.random()}`
+        beforeEach(async() => {
+            email = `manuelbarzi-${Math.random()}@mail.com`
             password = '123'
-            return users.add({name, surname, email, password})
-                .then(() => users.findByEmail(email))
-                .then((user) => {
-                    _id = user.id
-                    _token = jwt.sign({data: _id}, SECRET_JSON, { expiresIn: '48h' })
-                })
-                .catch((err) => {
-                    if (err) throw err
-                })
+            const hash = await bcrypt.hash(password, 10)
+            await User.create({name, surname, email, password: hash})
+            const user = await User.findOne({email})
+                _id = user.id
+                _token = jwt.sign({
+                    data: _id
+                }, SECRET_JSON, { expiresIn: '48h' })
             })
 
         it('should succeed on correct credentials', () => {
             return logic.removeUser(_id, _token)
-                .then(res => {
-                    expect(res.deletedCount).toBe(1)
-                })
-                .then(() => users.findByUserId(_id))
+                .then(() => User.findById(_id))
                 .then(user => {
                     expect(user).toBeNull()
                 })
             })
         // TODO more unit test cases
     })
-
-    // TODO updateUser and removeUser
 
     describe('search artists', () => {
         it('should succeed on matching query', () => {
@@ -760,34 +752,29 @@ describe('logic', () => {
 
     describe('retrieve artist', () => {
         const comment = {
-            artistId : '6tbjWDEIzxoDsBA1FuhfPW',
+            targetId : '6tbjWDEIzxoDsBA1FuhfPW',
             text: 'Such a cool song',
-            date: new Date
+            target: 'artist',
+            user: null,
         }
         const name = 'Manuel'
         const surname = 'Barzi'
         let email
         let password
 
-        beforeEach(() => {
-            email = `manuelbarzi@mail.com-${Math.random()}`
+        beforeEach(async() => {
+            email = `manuelbarzi-${Math.random()}@mail.com`
             password = '123'
-            return users.add({ name, surname, email, password })
-                .then(() => users.findByEmail(email))
-                .then(user => {
-                    comment.userId = user.id.toString()
-                    _id = user.id.toString()
-                    _token = jwt.sign({
-                        data: _id
-                    }, SECRET_JSON, { expiresIn: '48h' })
-                })
-                .catch((err) => {
-                    if (err) throw err
-                })
-                .then(() => {
-                    artistComments.add(comment)
-                })
-        })
+            const hash = await bcrypt.hash(password, 10)
+            await User.create({name, surname, email, password: hash})
+            const user = await User.findOne({email})
+                comment.user = user.id
+                _id = user.id
+                _token = jwt.sign({
+                    data: _id
+                }, SECRET_JSON, { expiresIn: '48h' })
+            await Comment.create(comment)
+            })
 
         it('should succeed on matching artistId', () => {
             const artistId = '6tbjWDEIzxoDsBA1FuhfPW'
@@ -826,26 +813,25 @@ describe('logic', () => {
         const name = 'Manuel'
         const surname = 'Barzi'
         let email
-        const password = '123'
+        let password
         const artistId = '6tbjWDEIzxoDsBA1FuhfPW' // madonna
         let _id, _token
 
-        beforeEach(() => {
-            email = `manuelbarzi@mail.com-${Math.random()}`
-            return users.add({name, surname, email, password})
-                .then(() => users.findByEmail(email))
-                .then((user) => {
-                    _id = user.id
-                    _token = jwt.sign({data: _id}, SECRET_JSON, { expiresIn: '48h' })
-                })
-                .catch((err) => {
-                    if (err) throw err
-                })
+        beforeEach(async() => {
+            email = `manuelbarzi-${Math.random()}@mail.com`
+            password = '123'
+            const hash = await bcrypt.hash(password, 10)
+            await User.create({name, surname, email, password: hash})
+            const user = await User.findOne({email})
+                _id = user.id
+                _token = jwt.sign({
+                    data: _id
+                }, SECRET_JSON, { expiresIn: '48h' })
             })
 
         it('should succeed on correct data', () =>
             logic.toggleFavoriteArtist(_id, _token, artistId)
-                .then(() => users.findByUserId(_id))
+                .then(() => User.findById(_id))
                 .then(user => {
                     expect(user.id).toEqual(_id)
                     expect(user.name).toBe(name)
@@ -858,7 +844,7 @@ describe('logic', () => {
 
                     return logic.toggleFavoriteArtist(_id, _token, artistId)
                 })
-                .then(() => users.findByUserId(_id))
+                .then(() => User.findById(_id))
                 .then(user => {
                     expect(user.id).toEqual(_id)
                     expect(user.name).toBe(name)
@@ -887,30 +873,31 @@ describe('logic', () => {
         const name = 'Manuel'
         const surname = 'Barzi'
         let email
-        const password = '123'
+        let password
         const artistId = '6tbjWDEIzxoDsBA1FuhfPW' // madonna
-        const comment = `comment ${Math.random()}`
-        let _id, _token
+        const text= 'Such a cool song'
 
-        beforeEach(() =>{
-            email = `manuelbarzi@mail.com-${Math.random()}`
-            return users.add({name, surname, email, password})
-                .then(() => users.findByEmail(email))
-                .then(user => {
-                    _id = user.id
-                    _token = jwt.sign({data: _id}, SECRET_JSON, { expiresIn: '48h' })
-                })
-                .catch((err) => {
-                    if (err) throw err
-                })
-        })
-        
-        it('should succeed on correct data', () =>
-            logic.addCommentToArtist(_id, _token, artistId, comment)
+
+        beforeEach(async() => {
+            email = `manuelbarzi-${Math.random()}@mail.com`
+            password = '123'
+            const hash = await bcrypt.hash(password, 10)
+            await User.create({name, surname, email, password: hash})
+            const user = await User.findOne({email})
+                _id = user.id
+                _token = jwt.sign({
+                    data: _id
+                }, SECRET_JSON, { expiresIn: '48h' })
+            })
+
+       
+        it('should succeed on correct data', () => {
+            logic.addCommentToArtist(_id, _token, artistId, text)
                 .then(id => {
+                    debugger
                     expect(id).toBeDefined()
 
-                    return artistComments.retrieve(id)
+                    return Comment.findById(id)
                         .then(_comment => {
                             expect(_comment.id).toBe(id)
                             expect(_comment.userId).toBe(_id)
@@ -918,13 +905,13 @@ describe('logic', () => {
                             expect(_comment.text).toBe(comment)
                         })
                 })
-        )
+            })
     })
 
     describe('list comments from artist', () => {
         const name = 'Manuel'
         const surname = 'Barzi'
-        const email = `manuelbarzi@mail.com-${Math.random()}`
+        const email = `manuelbarzi-${Math.random()}@mail.com`
         const password = '123'
         const artistId = '6tbjWDEIzxoDsBA1FuhfPW' // madonna
         const text = `comment ${Math.random()}`
@@ -934,15 +921,15 @@ describe('logic', () => {
         let _id, _token
 
         beforeEach(() =>
-            users.add({name, surname, email, password})
-                .then(() => users.findByEmail(email))
+            User.create({name, surname, email, password})
+                .then(() => User.findOne({email}))
                 .then(({ id, token }) => {
                     _id = id
                     _token = token
                 })
-                .then(() => artistComments.add(comment = { userId: _id, artistId, text }))
-                .then(() => artistComments.add(comment2 = { userId: _id, artistId, text: text2 }))
-                .then(() => artistComments.add(comment3 = { userId: _id, artistId, text: text3 }))
+                .then(() => Comment.create(comment = { user: _id, targetId: artistId, text, target: 'artist' }))
+                .then(() => Comment.create(comment2 = { user: _id, targetId: artistId, text: text2, target: 'artist' }))
+                .then(() => Comment.create(comment3 = { user: _id, targetId: artistId, text: text3, target: 'artist' }))
         )
 
         it('should succeed on correct data', () =>
@@ -951,10 +938,10 @@ describe('logic', () => {
                     expect(comments).toBeDefined()
                     expect(comments.length).toBe(3)
 
-                    comments.forEach(({ id, userId, artistId: _artistId, date }) => {
+                    comments.forEach(({ user, targetId, date, id }) => {
                         expect(id).toBeDefined()
-                        expect(userId).toEqual(_id)
-                        expect(_artistId).toEqual(artistId)
+                        expect(user.toString()).toEqual(_id)
+                        expect(targetId).toEqual(artistId)
                         expect(date).toBeDefined()
                         expect(date instanceof Date).toBeTruthy()
                     })
@@ -1093,7 +1080,7 @@ describe('logic', () => {
         })
     })
 
-    describe('toggle favorite album', () => {
+    false && describe('toggle favorite album', () => {
         const name = 'Manuel'
         const surname = 'Barzi'
         let email
@@ -1184,7 +1171,7 @@ describe('logic', () => {
         })
     })
 
-    describe('toggle favorite track', () => {
+    false && describe('toggle favorite track', () => {
         const name = 'Manuel'
         const surname = 'Barzi'
         const email = `manuelbarzi@mail.com-${Math.random()}`
@@ -1232,9 +1219,9 @@ describe('logic', () => {
 
     after(() =>
         Promise.all([
-            artistComments.removeAll(),
-            users.collection.deleteMany()
-                .then(() => client.close())
+            Comment.deleteMany(),
+            User.deleteMany()
+                .then(() => mongoose.disconnect())
         ])
     )
 })

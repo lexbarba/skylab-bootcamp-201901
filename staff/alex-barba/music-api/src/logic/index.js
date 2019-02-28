@@ -3,8 +3,7 @@
 require('dotenv').config()
 
 const spotifyApi = require('../spotify-api')
-const users = require('../data/users')
-const artistComments = require('../data/artist-comments')
+const {User, Comment} = require('../models')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt') 
 
@@ -39,13 +38,15 @@ const logic = {
 
 
         return (async()=> {
-            const user = await users.findByEmail(email)
+            const user = await User.findOne({email})
 
             if (user) throw Error(`user with email ${email} already exists`)
 
             const hash = await bcrypt.hash(password, 10)
 
-            return await users.add({ name, surname, email, password: hash })
+            const response =  await User.create({ name, surname, email, password: hash })
+
+            return response
         })()
     },
 
@@ -64,7 +65,7 @@ const logic = {
 
         return (async() => {
 
-            const user= await users.findByEmail(email)
+            const user= await User.findOne({email})
             if (!user) throw Error(`user with email ${email} not found`)
 
             const match= await bcrypt.compare(password, user.password)
@@ -92,10 +93,11 @@ const logic = {
         if (jwt.verify(token, SECRET_JSON).data !== userId) throw Error('Incorrect token')
 
         return (async() => {
-            const user = await users.findByUserId(userId)
-            if (!user) throw Error(`user with id ${id} not found`)
+            const user = await User.findById(userId).select('-__v -password').lean()
+            if (!user) throw Error(`user with id ${userId} not found`)
             
-            delete user.password
+            user.id= user._id.toString()
+            delete user._id
 
             return user
         })()
@@ -116,7 +118,7 @@ const logic = {
         if (!data) throw Error('data should be defined')
         if (data.constructor !== Object) throw TypeError(`${data} is not an object`)
 
-        return users.update(userId, data)
+        return User.findByIdAndUpdate(userId, data)
 
     },
     /**
@@ -132,7 +134,7 @@ const logic = {
         if (typeof userId !== 'string') throw TypeError(userId + ' is not a string')
         if (!userId.trim().length) throw Error('userId cannot be empty')
 
-        return users.remove(userId)
+        return User.findOneAndRemove(userId)
     },
 
 
@@ -160,10 +162,10 @@ const logic = {
 
         return (async() => {
             const artist = await spotifyApi.retrieveArtist(artistId)
-            const comments = await artistComments.find({ artistId: artist.id })
+            const comments = await Comment.find({ targetId: artistId })
             artist.comments = comments
             return artist
-        })
+        })()
     },
 
     /**
@@ -183,7 +185,7 @@ const logic = {
         
 
         return(async() => {
-            const user = await users.findByUserId(userId)
+            const user = await User.findById(userId)
             const { favoriteArtists = [] } = user
             const index = favoriteArtists.findIndex(_artistId => _artistId === artistId)
 
@@ -191,7 +193,7 @@ const logic = {
             else favoriteArtists.splice(index, 1)
 
             user.favoriteArtists = favoriteArtists
-            return users.update(user)
+            return User.updateOne(user)
         })()
     },
 
@@ -213,17 +215,19 @@ const logic = {
         if (!artistId.trim().length) throw Error('artistId cannot be empty')  
         if (typeof text !== 'string') throw TypeError(`text should be a string`)  
         if (!text.trim().length) throw Error('text cannot be empty')  
-
+        
         const comment = {
-            userId,
-            artistId,
+            user: userId,
+            targetId: artistId,
+            target: 'artist',
             text,
-            date: new Date
         }
-        //???
-        return users.findByUserId(userId)
-            .then(() => artistComments.add(comment))
-            .then(() => comment.id)
+
+        return(async() =>{
+            await User.findById(userId)
+            const {id} = await Comment.create(comment)
+            return id
+        })()
     },
 
     /**
@@ -243,8 +247,8 @@ const logic = {
         if (typeof commentId !== 'string') throw TypeError(`commentId should be a string`)  
         if (!commentId.trim().length) throw Error('commentId cannot be empty')  
 
-        return users.findByUserId(userId)
-            .then(() => artistComments.remove(commentId))
+        return User.findByUserId(userId)
+            .then(() => Comment.findByIdAndRemove(commentId))
     },
 
     /**
@@ -256,7 +260,7 @@ const logic = {
         // if (typeof artistId !== 'string') throw TypeError(`artistId should be a string`)  
         // if (!artistId.trim().length) throw Error('artistId cannot be empty')  
 
-        return artistComments.find({ artistId })
+        return Comment.find({ targetId: artistId })
     },
 
     /**
@@ -292,7 +296,6 @@ const logic = {
      */
     toggleFavoriteAlbum(userId, token, albumId) {
 
-        //todo
         if (typeof userId !== 'string') throw TypeError(`userId should be a string`)
         if (!userId.trim().length) throw Error('userId is empty')
         if (typeof token !== 'string') throw TypeError(`${token} is not a string`)    
@@ -302,7 +305,7 @@ const logic = {
         if (!albumId.trim().length) throw Error('albumId is empty')
 
         return(async() => {
-            const user = await users.findByUserId(userId)
+            const user = await User.findById(userId)
             const { favoriteAlbums = [] } = user
             const index = favoriteAlbums.findIndex(_albumId => _albumId === albumId)
 
@@ -311,7 +314,7 @@ const logic = {
 
             user.favoriteAlbums = favoriteAlbums
 
-            return users.update(user)
+            return User.update(user)
         })()
     },
 

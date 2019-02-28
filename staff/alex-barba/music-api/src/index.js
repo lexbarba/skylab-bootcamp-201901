@@ -2,11 +2,10 @@ require('dotenv').config()
 
 require('isomorphic-fetch')
 
-const { MongoClient } = require('mongodb')
+const mongoose = require('mongoose')
 const express = require('express')
 const bodyParser = require('body-parser')
 const spotifyApi = require('./spotify-api')
-const users = require('./data/users')
 const logic = require('./logic')
 const cors = require('cors')
 
@@ -18,13 +17,9 @@ spotifyApi.token = SPOTIFY_API_TOKEN
 spotifyApi.clientId = CLIENT_ID
 spotifyApi.clientSecret = CLIENT_SECRET
 
-MongoClient.connect(DB_URL, { useNewUrlParser: true })
-    .then(client => {
-
-        const db = client.db()
-        users.collection = db.collection('users')
-
-        spotifyApi.token = SPOTIFY_API_TOKEN;
+mongoose.connect(DB_URL, { useNewUrlParser: true })
+    .then(() =>{
+        spotifyApi.token = SPOTIFY_API_TOKEN
         logic.jwtSecret = SECRET_JSON
 
         const app = express()
@@ -74,7 +69,16 @@ MongoClient.connect(DB_URL, { useNewUrlParser: true })
         app.use('/api', router)
 
         app.listen(port, () => console.log(`server running on port ${port}`))
+        })
+        .catch(({message}) => {
+            console.error(message)
+    
+    process.on('SIGINT', () => {
+        mongoose.disconnect()
+            .then(() => {
+                console.log('\nserver stopped')
+                
+                process.exit(0)
+            })
     })
-    .catch(({message}) => {
-        console.error(message)
-    })
+})
