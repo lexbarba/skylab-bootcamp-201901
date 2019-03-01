@@ -2,7 +2,7 @@ const logic = require('../logic')
 
 module.exports = (req, res) => {
     const { params: { id } } = req
-    debugger
+
     try {
         logic.listCommentsFromArtist(id )
             .then(comments => res.json(comments))

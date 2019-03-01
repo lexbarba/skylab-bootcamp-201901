@@ -2,12 +2,12 @@ const logic = require('../logic')
 
 module.exports = (req, res) => {
 
-    const { body: { userId, artistId}, headers: { authorization } } = req
-    
-    const token = authorization.substring(7)
+    const { body: { artistId}, userId } = req
+
+    debugger
 
     try { 
-        logic.toggleFavoriteArtist(userId, token, artistId)
+        logic.toggleFavoriteArtist(userId, artistId)
             .then(res.json.bind(res))
             .catch(({ message }) => {
                 res.status(400).json({

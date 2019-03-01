@@ -6,10 +6,11 @@ const mongoose = require('mongoose')
 const express = require('express')
 const bodyParser = require('body-parser')
 const spotifyApi = require('./spotify-api')
-const logic = require('./logic')
 const cors = require('cors')
+const tokenHelper = require('./token-helper')
+const { tokenVerifierMiddleware } = tokenHelper
 
-const { registerUser, authenticateUser, retrieveUser, searchArtists, updateUser, retrieveArtist, retrieveAlbums, addCommentToArtist, listCommentsFromArtist, toggleFavoriteArtist, toggleFavoriteAlbum, toggleFavoriteTrack,retrieveAlbum, retrieveTrack, retrieveTracks ,notFound , deleteCommentFromArtist} = require('./routes')
+const { registerUser, authenticateUser, retrieveUser, searchArtists, updateUser, retrieveArtist, retrieveAlbums, addCommentToArtist, listCommentsFromArtist, toggleFavoriteArtist,retrieveAlbum, retrieveTrack, retrieveTracks ,notFound , deleteCommentFromArtist} = require('./routes')
 
 const { env: { DB_URL, PORT, SPOTIFY_API_TOKEN, SECRET_JSON, CLIENT_ID, CLIENT_SECRET }, argv: [, , port = PORT || 8080] } = process
 
@@ -20,7 +21,7 @@ spotifyApi.clientSecret = CLIENT_SECRET
 mongoose.connect(DB_URL, { useNewUrlParser: true })
     .then(() =>{
         spotifyApi.token = SPOTIFY_API_TOKEN
-        logic.jwtSecret = SECRET_JSON
+        tokenHelper.jwtSecret = SECRET_JSON
 
         const app = express()
 
@@ -34,33 +35,29 @@ mongoose.connect(DB_URL, { useNewUrlParser: true })
 
         router.post('/user/auth', jsonBodyParser, authenticateUser)
 
-        router.get ('/user/:id', retrieveUser)
+        router.get ('/user', tokenVerifierMiddleware,retrieveUser)
 
-        router.post('/user/:id/update', updateUser)
+        router.post('/user/update', updateUser)
 
         router.post('/search/q=:query', searchArtists)
 
         router.get('/artist/:id', retrieveArtist)
 
-        router.post('/artist/:id/comment', jsonBodyParser,addCommentToArtist)
+        router.post('/artist/:id/comment', [jsonBodyParser, tokenVerifierMiddleware],addCommentToArtist)
 
-        router.post('/artist/comment/:commentId', jsonBodyParser, deleteCommentFromArtist)
+        router.post('/artist/comment/:commentId', tokenVerifierMiddleware, deleteCommentFromArtist)
 
-        router.get('/artist/:id/comment', listCommentsFromArtist)
+        router.get('/artist/:id/comment', tokenVerifierMiddleware,listCommentsFromArtist)
 
-        router.post('/user/favoriteArtists', jsonBodyParser, toggleFavoriteArtist)
+        router.post('/user/favoriteArtists', [jsonBodyParser, tokenVerifierMiddleware], toggleFavoriteArtist)
 
         router.get('/artist/:id/albums', retrieveAlbums)
 
         router.get('/album/:id', retrieveAlbum)
 
-        // router.post('/album/:id', toggleFavoriteAlbum)
-
         router.get('/tracks/:id', retrieveTracks)
 
         router.get('/track/:id', retrieveTrack)
-
-        // router.post('/track/:id', toggleFavoriteTrack)
 
         router.get('*', notFound)
 

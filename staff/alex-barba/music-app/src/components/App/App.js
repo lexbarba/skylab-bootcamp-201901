@@ -19,7 +19,11 @@ class App extends Component {
         try {
             logic.login(email, password)
                 .then(() => logic.retrieveUser())
-                .then(user => { this.setState({ user: user.name, userEmail: user.email, userId: user.id}) })
+                .then(user => { 
+                    debugger
+                    this.setState({ user: user.name, userEmail: user.email, userId: user.id})
+                 })
+                
                 .then(() => this.setState({ loginFeedback: '' }))
                 .then(() => this.props.history.push('/home'))
                 .catch(({ message }) => this.setState({ loginFeedback: message }))

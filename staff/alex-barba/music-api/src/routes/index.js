@@ -28,9 +28,5 @@ module.exports = {
     
     retrieveTrack: require('./retrieve-track'),
 
-    toggleFavoriteAlbum: require('./toggle-favorite-album'),
-
-    toggleFavoriteTrack: require('./toggle-favorite-track'),
-
     notFound: require('./not-found'),
 }

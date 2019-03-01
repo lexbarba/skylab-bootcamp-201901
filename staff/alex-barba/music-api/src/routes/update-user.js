@@ -1,12 +1,11 @@
 const logic = require('../logic')
+const { verifyToken } = require('../token-helper')
 
 module.exports = (req, res) => {
-    const { body: { data }, params: { id }, headers: { authorization }  } = req
-
-    const token = authorization.substring(7)
+    const { body: { data }, userId } = req
 
     try {
-        logic.updateUser(id, token, data)
+        logic.updateUser(userId, data)
             .then(res.json.bind(res))
             .catch(({ message }) => {
                 res.status(400).json({

@@ -1,12 +1,12 @@
 const logic = require('../logic')
 
 module.exports = (req, res) => {
-    const { params: { commentId }, body: { userId }, headers: { authorization } } = req
+    const { params: { commentId }, userId} = req
 
-    const token = authorization.substring(7)
+    debugger
 
     try {
-        logic.deleteCommentFromArtist(commentId, token, userId)
+        logic.deleteCommentFromArtist(commentId, userId)
             .then(id => res.json({ id }))
             .catch(({ message }) => {
                 res.status(409).json({

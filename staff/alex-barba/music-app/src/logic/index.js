@@ -8,7 +8,6 @@ import musicApi from '../music-api/index'
 
 const logic = {
 
-    __userId__: null,
     __userApiToken__: null,
 
     /**
@@ -27,7 +26,6 @@ const logic = {
 
         return musicApi.authenticate(email, password)
             .then(res => {
-                this.__userId__ = res.id
                 this.__userApiToken__= res.token
                 return res
             })
@@ -74,19 +72,18 @@ const logic = {
      * Checks user is logged in.
      */
     get isUserLoggedIn() {
-        return !!this.__userId__
+        return !!this.__userApiToken__
     },
 
     /**
      * Logs out the user.
      */
     logOutUser() {
-        this.__userId__ = null
         this.__userApiToken__ = null
     },
     
     retrieveUser() {
-        return musicApi.retrieve(this.__userId__, this.__userApiToken__)
+        return musicApi.retrieve(this.__userApiToken__)
         .then(({ id, name, surname, email, favoriteArtists = [], favoriteAlbums = [], favoriteTracks = [] }) => ({
             id,
             name,
@@ -98,33 +95,6 @@ const logic = {
         }))
     },
 
-    // retrieveFavourites: function ( id, title, email, callback) {
-    //     if (typeof email !== 'string') throw TypeError(email + ' is not a string')
-    //     if (!email.trim().length) throw Error('email cannot be empty')
-
-    //     if (typeof id !== 'string') throw TypeError(id + ' is not a string')
-    //     if (!id.trim().length) throw Error('id cannot be empty')
-
-    //     var user = users.find(function (user) {
-    //         return user.email === email
-    //     })
-    //     console.log(user)
-
-    //     if (!user) throw Error('user ' + email + ' not found')
-
-    //     var exists = user.favourites.findIndex(obj => obj.id === id)
-    //     let toSend = {id, title}
-
-    //     if (exists !== -1) {
-    //         user.favourites.splice(exists, 1)
-    //         callback(user.favourites)   
-    //         return false
-    //     } else {
-    //         user.favourites.push(toSend)
-    //         callback(user.favourites)
-    //         return true
-    //     }
-    // },
 
     /**
      * Search artists.
@@ -193,7 +163,7 @@ const logic = {
         if  (typeof artistId !== 'string') throw TypeError (`${artistId} is not a string`)       
         if (!artistId.trim().length) throw Error('artistId is empty')
 
-        return musicApi.toggleFavoriteArtist(this.__userId__, this.__userApiToken__, artistId)
+        return musicApi.toggleFavoriteArtist(this.__userApiToken__, artistId)
     },
 
     addCommentToArtist(artistId, text){
@@ -203,7 +173,7 @@ const logic = {
         if  (typeof text !== 'string') throw TypeError (`${text} is not a string`)  
         if (!text.trim().length) throw Error('text is empty')
 
-        return musicApi.addCommentToArtist(this.__userId__, this.__userApiToken__, artistId, text)
+        return musicApi.addCommentToArtist(this.__userApiToken__, artistId, text)
     },
 
     listCommentsFromArtist(artistId){
@@ -217,7 +187,7 @@ const logic = {
         if  (typeof commentId !== 'string') throw TypeError (`${commentId} is not a string`)  
         if (!commentId.trim().length) throw Error('commentId is empty')
 
-        return musicApi.deleteCommentFromArtist(this.__userId__, this.__userApiToken__, commentId)
+        return musicApi.deleteCommentFromArtist(this.__userApiToken__, commentId)
     }
 }
 

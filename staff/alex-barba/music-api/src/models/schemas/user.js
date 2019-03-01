@@ -28,20 +28,11 @@ const User = new Schema({
         required: true
     },
 
-    favoriteArtists: [{
-        type: String,
-        unique: true
-    }],
+    favoriteArtists: [{type: String}],
 
-    favoriteAlbums: [{
-        type: String,
-        unique: true
-    }],
+    favoriteAlbums: [{type: String}],
 
-    favoriteTracks: [{
-        type: String,
-        unique: true
-    }]
+    favoriteTracks: [{type: String}]
 })
 
 module.exports = User

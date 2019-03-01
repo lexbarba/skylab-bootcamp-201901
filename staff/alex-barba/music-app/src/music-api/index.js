@@ -83,18 +83,15 @@
      * 
      * Retrieves user information.
      * 
-     * @param {*} id 
      * @param {*} token 
      */
 
-    retrieve(id, token) {
-        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
-        if (!id.trim().length) throw Error('id is empty')
+    retrieve(token) {
 
         if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
         if (!token.trim().length) throw Error('token is empty')
 
-        return fetch(`http://localhost:8000/api/user/${id}`, { 
+        return fetch(`http://localhost:8000/api/user`, { 
             method: 'GET', 
             headers: {
                 authorization: `Bearer ${token}`,
@@ -112,21 +109,18 @@
      * 
      * Updates user information.
      * 
-     * @param {*} id 
      * @param {*} token 
      * @param {*} object 
      */
 
-    update(id, token, object) {
-        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
-        if (!id.trim().length) throw Error('id is empty')
+    update(token, object) {
 
         if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
         if (!token.trim().length) throw Error('token is empty')
 
         if (Object.entries(object).length === 0) throw Error(`${object} is empty`)
 
-        return fetch(`http://localhost:8000/api/user/${id}/update`, { 
+        return fetch(`http://localhost:8000/api/user/update`, { 
             method: 'POST', 
             headers: {
                 authorization: `Bearer ${token}`,
@@ -145,20 +139,17 @@
      * 
      * Removes user.
      * 
-     * @param {*} id 
      * @param {*} token 
      * @param {*} email 
      * @param {*} password 
      */
 
-    remove(id, token, email, password) {
-        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
-        if (!id.trim().length) throw Error('id is empty')
+    remove(token, email, password) {
 
         if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
         if (!token.trim().length) throw Error('token is empty')
 
-        return fetch(`https://skylabcoders.herokuapp.com/api/user/${id}`, { 
+        return fetch(`https://skylabcoders.herokuapp.com/api/user`, { 
             method: 'DELETE', 
             headers: {
                 authorization: `Bearer ${token}`,
@@ -177,17 +168,13 @@
 
     /**
      * 
-     * Updates user information.
+     * TRoggles favorist artist of a user.
      * 
-     * @param {*} id 
      * @param {*} token 
      * @param {*} object 
      */
 
-    toggleFavoriteArtist(userId, token, artistId) {
-
-        if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
-        if (!userId.trim().length) throw Error('id is empty')
+    toggleFavoriteArtist(token, artistId) {
 
         if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
         if (!token.trim().length) throw Error('token is empty')
@@ -201,7 +188,7 @@
                 authorization: `Bearer ${token}`,
                 'content-type': 'application/json'
             },
-            body: JSON.stringify({ userId, artistId }),
+            body: JSON.stringify({ artistId }),
         })
             .then(response => response.json())
             .then(response => {
@@ -254,7 +241,7 @@
             .then(response => response)
     },
 
-        /**
+    /**
      * Retrieves tracks from album.
      * 
      * @param {string} albumId - The album to retrieve tracks from.
@@ -298,15 +285,11 @@
      * 
      * Adds comment to Artist.
      * 
-     * @param {*} id 
      * @param {*} token 
      * @param {*} object 
      */
 
-    addCommentToArtist(userId, token, artistId, text) {
-
-        if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
-        if (!userId.trim().length) throw Error('id is empty')
+    addCommentToArtist(token, artistId, text) {
 
         if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
         if (!token.trim().length) throw Error('token is empty')
@@ -323,7 +306,7 @@
                 authorization: `Bearer ${token}`,
                 'content-type': 'application/json'
             },
-            body: JSON.stringify({ userId, text }),
+            body: JSON.stringify({ text }),
         })
             .then(response => response.json())
             .then(response => {
@@ -371,10 +354,7 @@
      * @param {*} object 
      */
 
-    deleteCommentFromArtist(userId, token, commentId) {
-
-        if (typeof userId !== 'string') throw TypeError(`${userId} is not a string`)
-        if (!userId.trim().length) throw Error('id is empty')
+    deleteCommentFromArtist(token, commentId) {
 
         if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
         if (!token.trim().length) throw Error('token is empty')
@@ -386,9 +366,7 @@
             method: 'POST', 
             headers: {
                 authorization: `Bearer ${token}`,
-                'content-type': 'application/json'
             },
-            body: JSON.stringify({ userId }),
         })
             .then(response => response.json())
             .then(response => {
