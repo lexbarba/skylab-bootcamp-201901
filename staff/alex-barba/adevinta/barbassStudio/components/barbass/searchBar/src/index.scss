@@ -1,0 +1,48 @@
+// Color
+
+$light-grey: #BBBBBB;
+$dark-grey: #606060;
+$white: #F7F7F7;
+$light-blue:#CBE6F0;
+$dark-blue: #7699C5;
+
+// $c-primary: $dark-grey;
+
+
+@import '~@s-ui/react-atom-input/lib/index';
+@import '~@schibstedspain/sui-theme/lib/index';
+@import '~@schibstedspain/sui-atom-button/lib/index';
+
+.sui-AtomButton--primary:not(.sui-AtomButton--disabled):hover {
+  background-color: $dark-grey;
+  border-color: $white;
+}
+
+.sktest-BarbasSearchBar {
+  display: flex;
+  justify-content: space-around
+}
+.sktest-BarbasSearchBar-wrapper {
+  display: flex
+}
+
+.sktest-BarbasSearchBar-input {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: auto;
+}
+
+.sktest-BarbasSearchBar-button {
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: auto;
+  color: $dark-grey;
+  background: none;
+  border-color: $dark-grey
+}
+
+.sktest-BarbasSearchBar-button:hover {
+  background-color: $dark-grey;
+  color: $white;
+  border-color: $white
+}
