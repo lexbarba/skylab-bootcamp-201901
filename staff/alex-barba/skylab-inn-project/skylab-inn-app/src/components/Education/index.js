@@ -44,7 +44,7 @@ export default function Education({ onAddEducation, onEditEducation, onAddInform
                 <i className='fas fa-plus-circle icon icon--link' onClick={e => { e.preventDefault(); handleOnAddEducation() }}></i>
             </div>
             {addEducation && <form onSubmit={e => handleAddInformation(e, 'Education')}>
-                <input type='text' name='education' placeholder='College' onChange={e => setCollege(e.target.value)} required></input>
+                <input type='text' name='education' placeholder='College' onChange={e => setCollege(e.target.value)} autoFocus required></input>
                 <input type='text' name='education' placeholder='Degree' onChange={e => setDegree(e.target.value)} required></input>
                 <div className='education-container__form-button'>
                     <button className='btn btn--success' type='submit'>Add</button>
@@ -56,7 +56,7 @@ export default function Education({ onAddEducation, onEditEducation, onAddInform
                     {editEducation === edu._id ?
                         <form onSubmit={e => handleUpdateInformation(e, 'Education', edu._id)}>
                             <div className='line' />
-                            <input type='text' name='education' placeholder='College' onChange={e => setCollege(e.target.value)} defaultValue={edu.college} required></input>
+                            <input type='text' name='education' placeholder='College' onChange={e => setCollege(e.target.value)} defaultValue={edu.college} autoFocus required></input>
                             <input type='text' name='education' placeholder='Degree' onChange={e => setDegree(e.target.value)} defaultValue={edu.degree} required></input>
                             <div className='education-container__form-button'>
                                 <button className='btn btn--success' type='submit'>Update</button>

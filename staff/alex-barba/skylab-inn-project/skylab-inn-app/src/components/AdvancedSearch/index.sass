@@ -4,17 +4,18 @@
     display: flex
     flex-direction: column
     flex-wrap: nowrap
-    height: 93vh
+    height: 90.3%
 
     @include desktop
-        height: 100vh
+        height: 100%
     
     &-header
         flex-shrink: 0
         padding-top: 3rem
         font-size: $xlarge
-        align-self: center
         text-align: center
+        margin-left: 2rem
+        margin-right: 2rem
 
         @include tablet
             padding-top: 4rem
@@ -105,7 +106,8 @@
         flex-grow: 1
         overflow: auto
         padding-top: 1rem
-        margin-bottom: 0.5rem
+        padding-bottom: 0.5rem
+        margin-bottom: 0.3rem
         margin-left: 2rem
         margin-right: 2rem
 
@@ -136,16 +138,11 @@
             @include tablet
                 font-size: $medium--tablet
 
-.url
+.share
     text-align: center
     font-size: $medium
-
-    @include tablet
-        font-size: $medium--tablet
-
-.share
-    margin-bottom: 0.5rem
+    height: 7%
 
     @include tablet
         margin-bottom: 0rem
-    
+        font-size: $medium--tablet

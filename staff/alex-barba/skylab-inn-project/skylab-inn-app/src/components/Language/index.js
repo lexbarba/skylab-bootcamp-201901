@@ -58,7 +58,7 @@ export default function Language({ onAddLanguage, onEditLanguage, onAddInformati
                 <i className='fas fa-plus-circle icon icon--link' onClick={e => { e.preventDefault(); handleOnAddLanguage() }}></i>
             </div>
             {addLanguage && <form onSubmit={e => handleAddInformation(e, 'Language')}>
-                <input type='text' name='language' placeholder='Language' onChange={e => setLanguage(e.target.value)} required></input>
+                <input type='text' name='language' placeholder='Language' onChange={e => setLanguage(e.target.value)} autoFocus required></input>
                 <select className='dropdown-content' onChange={e => setLevelLanguage(e.target.value)}>
                     <option>Choose a level</option>
                     <option value='Elementary proficiency'>Elementary proficiency</option>
@@ -77,7 +77,7 @@ export default function Language({ onAddLanguage, onEditLanguage, onAddInformati
                     {editLanguage === lang._id ?
                         <form onSubmit={e => handleUpdateInformation(e, 'Language', lang._id)}>
                              <div className='line'/> 
-                            <input type='text' name='language' placeholder='Language' onChange={e => setLanguage(e.target.value)} defaultValue={lang.language} required></input>
+                            <input type='text' name='language' placeholder='Language' onChange={e => setLanguage(e.target.value)} defaultValue={lang.language} autoFocus required></input>
                             <select className='dropdown-content' onChange={e => setLevelLanguage(e.target.value)} defaultValue={lang.level}>
                                 <option value='Choose a level'>Choose a level</option>
                                 <option value='Elementary proficiency'>Elementary proficiency</option>

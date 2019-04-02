@@ -58,7 +58,7 @@ export default function Technology({ onAddTech, onEditTech, onAddInformation, on
                 <i className='fas fa-plus-circle icon icon--link' onClick={e => { e.preventDefault(); handleOnAddTech() }}></i>
             </div>
             {addTechnology && <form onSubmit={e => handleAddInformation(e, 'Tech')}>
-                <input type='text' name='technology' placeholder='Technology' onChange={e => setTech(e.target.value)} required></input>
+                <input type='text' name='technology' placeholder='Technology' onChange={e => setTech(e.target.value)} autoFocus required></input>
                 <select className='dropdown-content' onChange={e => setLevelTech(e.target.value)}>
                     <option>Choose a level</option>
                     <option value='Fundamental awareness'>Fundamental awareness</option>
@@ -77,7 +77,7 @@ export default function Technology({ onAddTech, onEditTech, onAddInformation, on
                     {editTechnology === tech._id ?
                         <form onSubmit={e => handleUpdateInformation(e, 'Tech', tech._id)}>
                             <div className='line' />
-                            <input type='text' name='technology' placeholder='Technology' onChange={e => setTech(e.target.value)} defaultValue={tech.tech} required></input>
+                            <input type='text' name='technology' placeholder='Technology' onChange={e => setTech(e.target.value)} defaultValue={tech.tech} autoFocus required></input>
                             <select className='dropdown-content' onChange={e => setLevelTech(e.target.value)} defaultValue={tech.level}>
                                 <option value='Choose a level'>Choose a level</option>
                                 <option value='Fundamental awareness'>Fundamental awareness</option>

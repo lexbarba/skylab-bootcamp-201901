@@ -4,15 +4,14 @@
     display: flex
     flex-direction: column
     flex-wrap: nowrap
-    height: 93vh
+    height: 93%
 
     @include desktop
-        height: 100vh
+        height: 100%
     
     &-header
         flex-shrink: 0
-        padding-top: 3rem
-        align-self: center
+        padding-top: 2rem
         text-align: center
         fontsize: $xlarge
         margin-left: 2rem
@@ -57,15 +56,15 @@
     &-pendSign
         flex-grow: 1
         overflow: auto
-        padding-top: 1rem
+        padding-top: 0.5rem
         margin-left: 2rem
         margin-right: 2rem
-        margin-bottom: 1rem
+        margin-bottom: 0.5rem
+        padding-bottom: 0.5rem
 
         @include tablet
             margin-left: 6rem
             margin-right: 6rem
-
 
         &__header
             flex-shrink: 0
@@ -86,10 +85,11 @@
     &-pendEmail
         flex-grow: 1
         overflow: auto
-        padding-top: 1rem
+        padding-top: 0.5rem
         margin-bottom: 0.5rem
         margin-left: 2rem
         margin-right: 2rem
+        padding-bottom: 0.6rem
 
         @include tablet
             margin-left: 6rem

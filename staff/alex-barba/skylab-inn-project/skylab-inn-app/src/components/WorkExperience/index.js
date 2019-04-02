@@ -108,7 +108,7 @@ export default function WorkExperience({ onAddWork, onEditWork, onAddInformation
             </div>
             {addWorkExperience && <div className='workExp-container__form'>
                 <form onSubmit={e => handleAddInformation(e, 'Work')}>
-                    <input type='text' name='company' placeholder='Company' onChange={e => setCompany(e.target.value)} required></input>
+                    <input type='text' name='company' placeholder='Company' onChange={e => setCompany(e.target.value)} autoFocus required></input>
                     <input type='text' name='position' placeholder='Position' onChange={e => setPosition(e.target.value)} required></input>
                     <input type='date' name='startDate' placeholder='Start date' onChange={e => setStartDate(e.target.value)} defaultValue={_startDate} required></input>
                     {_current ? null : <input type='date' name='endDate' placeholder='End Date' onChange={e => setEndDate(e.target.value)} defaultValue={_endDate} ></input>}<br />
@@ -127,7 +127,7 @@ export default function WorkExperience({ onAddWork, onEditWork, onAddInformation
                     {editWork === exp._id ?
                         <form onSubmit={e => handleUpdateInformation(e, 'Work', exp._id)}>
                             <div className='line' />
-                            <input type='text' name='company' placeholder='Company' onChange={e => setCompany(e.target.value)} defaultValue={exp.company} required></input>
+                            <input type='text' name='company' placeholder='Company' onChange={e => setCompany(e.target.value)} defaultValue={exp.company} autoFocus required></input>
                             <input type='text' name='position' placeholder='Position' onChange={e => setPosition(e.target.value)} defaultValue={exp.position} required></input>
                             <input type='date' name='startDate' placeholder='Start date' onChange={e => setStartDate(e.target.value)} defaultValue={new Date(exp.startDate).toISOString().substr(0, 10)} required></input>
                             {_current ? null : <input type='date' name='endDate' placeholder='End Date' onChange={e => setEndDate(e.target.value)} defaultValue={new Date(_endDate).toISOString().substr(0, 10)}></input>}
